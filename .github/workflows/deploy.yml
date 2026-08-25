@@ -68,10 +68,10 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
           local-dir: ./dist/
-          server-dir: public_html/
+          server-dir: ${{ secrets.FTP_PASS }}
           dangerous-clean-slate: false
           exclude: |
             **/.git*
