@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vitumer DSL Reference</title>
+    <meta
+      name="description"
+      content="Vitumer DSL syntax, examples, and shareable session link format for AI assistants and developers."
+    />
+    <meta name="application-name" content="Vitumer" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM documentation" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f172a;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: #334155;
+        --accent: #a78bfa;
+        --code-bg: #1e293b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 4rem;
+      }
+      h1, h2 { font-family: "JetBrains Mono", ui-monospace, monospace; }
+      h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+      .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+      h2 {
+        font-size: 1rem;
+        margin: 2rem 0 0.75rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      p, li { color: var(--text); }
+      li { margin: 0.35rem 0; }
+      code, pre {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 0.85rem;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      a { color: var(--accent); }
+      .example { margin-bottom: 1rem; }
+      .example-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+      nav { margin-bottom: 2rem; font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="/">← Open Vitumer</a>
+        ·
+        <a href="/llms.txt">llms.txt</a>
+      </nav>
+
+      <h1>Vitumer DSL Reference</h1>
+      <p class="subtitle">
+        Static reference for humans, crawlers, and AI assistants. No JavaScript required.
+      </p>
+
+      <h2>Syntax</h2>
+      <ul>
+        <li><strong>Block:</strong> <code>{duration}{h|m|s} {label} {optional description} [optional attributes]</code></li>
+        <li><strong>Sequence:</strong> <code>block + block + ...</code></li>
+        <li><strong>Loop:</strong> <code>N * (block + block + ...)</code></li>
+        <li><strong>Attributes</strong> (per block): <code>color</code>, <code>emoji</code>, <code>skippable</code>, <code>retry</code></li>
+        <li><strong>Units:</strong> <code>h</code> hours, <code>m</code> minutes, <code>s</code> seconds</li>
+        <li><strong>Colors:</strong> orange, teal, blue, purple, rose, amber</li>
+      </ul>
+
+      <h2>Examples</h2>
+
+      <div class="example">
+        <div class="example-title">Single block</div>
+        <pre>25m work {Deep work} [emoji:💻, color:orange]</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">Loop</div>
+        <pre>4 * (25m work + 5m rest)</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">Custom rest</div>
+        <pre>10m break [emoji:☕, color:teal]</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">HIIT</div>
+        <pre>5 * (30s work + 15s rest)</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">Aeropress</div>
+        <pre>3 * (1m prep [emoji:☕] + 4m brew + 2m rest [color:teal])</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">Pomodoro</div>
+        <pre>3 * (25m pomo [color:orange] + 5m break [color:teal])</pre>
+      </div>
+
+      <h2>Shareable links</h2>
+      <p>
+        Encode a DSL string as base64 (UTF-8) and append it to the app URL:
+      </p>
+      <pre>https://{your-origin}/?flow={base64-dsl}</pre>
+      <p>Example DSL:</p>
+      <pre>3 * (25m pomo [color:orange] + 5m break [color:teal])</pre>
+      <p>Example base64:</p>
+      <pre>MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=</pre>
+      <p>Example link (replace origin with your deployment):</p>
+      <pre>https://{your-origin}/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=</pre>
+
+      <h2>For AI assistants</h2>
+      <p>
+        When creating a session for a user, return the DSL, a share link (if origin is known), and a short schedule explanation.
+        Put block attributes on each block, not after a loop.
+        See also <a href="/llms.txt">/llms.txt</a> for machine-readable docs.
+      </p>
+    </main>
+  </body>
+</html>

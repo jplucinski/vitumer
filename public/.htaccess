@@ -1,0 +1,24 @@
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # OAuth callback — physical file exists, but some hosts omit trailing slash
+  RewriteRule ^openrouter/callback/?$ /openrouter/callback/index.html [L]
+
+  # Static files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # SPA fallback (Vitumer is a client-side app)
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Avoid stale app shell after deploy (LiteSpeed / LSCache friendly)
+<IfModule mod_headers.c>
+  <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+</IfModule>

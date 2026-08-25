@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# LLM-readable documentation: /llms.txt
+# DSL reference (static HTML): /docs/dsl/
