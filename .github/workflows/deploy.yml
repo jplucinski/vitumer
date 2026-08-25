@@ -1,13 +1,3 @@
-# Copy to deploy.yml and configure GitHub secrets / environment.
-#
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   FTP_HOST      — FTP server hostname
-#   FTP_USERNAME  — FTP login
-#   FTP_PASSWORD  — FTP password
-#
-# Optional: GitHub environment (Settings → Environments) e.g. "production"
-#   — use for approval gates or environment-scoped secrets
-
 name: Deploy static site via FTP
 
 on:
@@ -28,8 +18,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment:
-      name: production
-      url: https://YOUR_DOMAIN.example
+      name: h26
+      url: https://vitumer.jplucinski.dev
 
     steps:
       - name: Checkout code
