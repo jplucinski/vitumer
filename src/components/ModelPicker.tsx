@@ -6,6 +6,7 @@ type Props = {
   value: string;
   onChange: (modelId: string) => void;
   apiKey?: string | null;
+  variant?: 'default' | 'compact';
 };
 
 function formatContextLength(tokens?: number): string | null {
@@ -27,7 +28,7 @@ function formatPrice(pricing?: OpenRouterModel['pricing']): string | null {
   return `$${perM.toFixed(1)}/M`;
 }
 
-export function ModelPicker({ value, onChange, apiKey }: Props) {
+export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<ModelSort>('most-popular');
   const [models, setModels] = useState<OpenRouterModel[]>([]);
@@ -133,24 +134,26 @@ export function ModelPicker({ value, onChange, apiKey }: Props) {
 
   return (
     <div className="model-picker" ref={containerRef}>
-      {value && !isOpen && (
+      {value && (
         <div className="model-picker-selected text-xs mb-1.5 font-mono opacity-70 truncate">
           Selected: {value}
         </div>
       )}
 
-      <div className="flex gap-2 mb-2">
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as ModelSort)}
-          className="select flex-1 rounded-lg p-2 text-xs"
-          aria-label="Sort models"
-        >
-          <option value="most-popular">Popular</option>
-          <option value="pricing-low-to-high">Cheapest</option>
-          <option value="pricing-high-to-low">Most expensive</option>
-        </select>
-      </div>
+      {variant !== 'compact' && (
+        <div className="flex gap-2 mb-2">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as ModelSort)}
+            className="select flex-1 rounded-lg p-2 text-xs"
+            aria-label="Sort models"
+          >
+            <option value="most-popular">Popular</option>
+            <option value="pricing-low-to-high">Cheapest</option>
+            <option value="pricing-high-to-low">Most expensive</option>
+          </select>
+        </div>
+      )}
 
       <div className="relative">
         <input
