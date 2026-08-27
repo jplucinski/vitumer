@@ -19,6 +19,7 @@ import {
   buildBlockGenerationSystemPrompt,
   type PromptMode,
 } from '../constants/aiPrompts';
+import { AI_CALL_COPY, AiCallError, normalizeAiCallError, parseOpenRouterError } from './aiCallError';
 
 const CACHE_PREFIX = STORAGE_KEYS.aiCachePrefix;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -64,6 +65,13 @@ function setCachedResponse(cacheKey: string, response: AIResponse): void {
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isAutoRetryable(err: unknown, attempt: number): boolean {
+  if (attempt >= MAX_RETRIES) return false;
+  if (!(err instanceof AiCallError) || err.kind !== 'provider') return false;
+  if (err.status === undefined) return true;
+  return err.status === 429 || err.status >= 500;
 }
 
 function buildSystemPrompt(
@@ -185,16 +193,13 @@ export async function generateBlocksFromConversation(
 
       if (!resp.ok) {
         const errorText = await resp.text();
-        if (resp.status === 429 || resp.status >= 500) {
-          throw new Error(`AI API Error (${resp.status}): ${errorText}`);
-        }
-        throw new Error(`AI API Error (${resp.status}): ${errorText}`);
+        throw parseOpenRouterError(resp.status, errorText);
       }
 
       const result = await resp.json();
       const content = result?.choices?.[0]?.message?.content;
       if (!content) {
-        throw new Error('Empty response from model API.');
+        throw new AiCallError('parse', AI_CALL_COPY.parse);
       }
 
       try {
@@ -212,21 +217,22 @@ export async function generateBlocksFromConversation(
         };
         setCachedResponse(cacheKey, aiResponse);
         return aiResponse;
-      } catch (err: any) {
-        throw new Error(`Failed to parse AI model response: ${err.message}. Content: ${content}`);
+      } catch (err: unknown) {
+        if (err instanceof AiCallError) throw err;
+        throw new AiCallError('parse', AI_CALL_COPY.parse);
       }
     } catch (err) {
-      lastError = err;
+      const normalized = err instanceof AiCallError ? err : normalizeAiCallError(err);
+      lastError = normalized;
       attempt += 1;
-      const isRetryable = attempt < MAX_RETRIES && (
-        err instanceof Error && (/429|500|502|503|504/.test((err.message || '')) || err.message.includes('NetworkError'))
-      );
-      if (!isRetryable) break;
+      if (!isAutoRetryable(normalized, attempt)) break;
       await delay(400 * attempt);
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error('Unknown AI error.');
+  throw lastError instanceof AiCallError
+    ? lastError
+    : normalizeAiCallError(lastError);
 }
 
 export async function generateBlocksFromAI(
