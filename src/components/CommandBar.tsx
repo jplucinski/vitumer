@@ -16,9 +16,18 @@ interface CommandBarProps {
   apiKey: string | null;
   modelId: string;
   promptMode: PromptMode;
+  onOpenSettings: () => void;
+  onModelChange: (modelId: string) => void;
 }
 
-const CommandBar: React.FC<CommandBarProps> = ({ setBlocks, apiKey, modelId, promptMode }) => {
+const CommandBar: React.FC<CommandBarProps> = ({
+  setBlocks,
+  apiKey,
+  modelId,
+  promptMode,
+  onOpenSettings,
+  onModelChange,
+}) => {
   const [activeTab, setActiveTab] = useState<'ai' | 'dsl'>('ai');
   const [dslInput, setDslInput] = useState('');
   const [dslError, setDslError] = useState('');
@@ -96,6 +105,8 @@ const CommandBar: React.FC<CommandBarProps> = ({ setBlocks, apiKey, modelId, pro
             promptMode={promptMode}
             onEditInDsl={handleEditInDsl}
             onFeedback={showTransientFeedback}
+            onOpenSettings={onOpenSettings}
+            onModelChange={onModelChange}
           />
         ) : (
           <div className="p-4 space-y-4">

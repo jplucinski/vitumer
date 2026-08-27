@@ -6,6 +6,7 @@ import { stringifyBlocks } from '../utils/dslSchema';
 import { useAISessionThread } from '../hooks/useAISessionThread';
 import { AISuggestionPreview } from './AISuggestionPreview';
 import { AIThinkingPanel } from './AIThinkingPanel';
+import { ModelPicker } from './ModelPicker';
 import { AIRefinementSuggestion, AITurn } from '../types/aiSession';
 import type { PromptMode } from '../constants/aiPrompts';
 
@@ -29,6 +30,8 @@ interface AISessionThreadProps {
   promptMode: PromptMode;
   onEditInDsl: (dsl: string) => void;
   onFeedback: (message: string, type?: 'success' | 'error' | 'info') => void;
+  onOpenSettings: () => void;
+  onModelChange: (modelId: string) => void;
 }
 
 function UserTurnBubble({
@@ -112,6 +115,8 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
   promptMode,
   onEditInDsl,
   onFeedback,
+  onOpenSettings,
+  onModelChange,
 }) => {
   const [composerText, setComposerText] = useState('');
   const threadEndRef = useRef<HTMLDivElement>(null);
@@ -129,6 +134,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
     rejectTurn,
     resetThread,
     clearError,
+    retry,
   } = useAISessionThread({
     apiKey,
     modelId,
@@ -150,10 +156,6 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
 
   const handleSend = async () => {
     if (!composerText.trim()) return;
-    if (!apiKey) {
-      onFeedback('Connect OpenRouter in Settings to generate a session with AI.', 'error');
-      return;
-    }
     const text = composerText;
     setComposerText('');
     await sendMessage(text);
@@ -293,16 +295,58 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
       </div>
 
       {error && (
-        <div className="mx-3 mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs text-red-200 font-mono flex items-start justify-between gap-3">
-          <span>{error}</span>
-          <button
-            onClick={clearError}
-            className="opacity-60 hover:opacity-100 shrink-0"
-            type="button"
-            aria-label="Dismiss"
-          >
-            <X size={14} />
-          </button>
+        <div className="mx-3 mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs text-red-200 font-mono space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <p>{error.message}</p>
+              {error.detail && <p className="opacity-70 break-words">{error.detail}</p>}
+            </div>
+            <button
+              onClick={clearError}
+              className="opacity-60 hover:opacity-100 shrink-0"
+              type="button"
+              aria-label="Dismiss"
+            >
+              <X size={14} />
+            </button>
+          </div>
+          {error.kind === 'auth' && (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="text-[11px] font-semibold underline underline-offset-2 opacity-90 hover:opacity-100"
+            >
+              Settings
+            </button>
+          )}
+          {error.kind === 'provider' && (
+            <div className="space-y-2">
+              <ModelPicker
+                value={modelId}
+                onChange={onModelChange}
+                apiKey={apiKey}
+                variant="compact"
+              />
+              <button
+                type="button"
+                onClick={() => void retry()}
+                disabled={isThinking}
+                className="px-2.5 py-1 rounded-lg border border-red-400/20 text-[11px] font-semibold opacity-90 hover:opacity-100 disabled:opacity-40"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          {(error.kind === 'parse' || error.kind === 'empty') && (
+            <button
+              type="button"
+              onClick={() => void retry()}
+              disabled={isThinking}
+              className="px-2.5 py-1 rounded-lg border border-red-400/20 text-[11px] font-semibold opacity-90 hover:opacity-100 disabled:opacity-40"
+            >
+              Retry
+            </button>
+          )}
         </div>
       )}
 
