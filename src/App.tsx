@@ -20,6 +20,7 @@ import BlockList from './components/BlockList';
 import SessionLaunchCard from './components/SessionLaunchCard';
 import AIFeedback from './components/AIFeedback';
 import PromptsPage from './components/PromptsPage';
+import AIAgentsPage from './components/AIAgentsPage';
 import { ModelPicker } from './components/ModelPicker';
 import { FlowBlock, parseDSL } from './utils/dslParser';
 import { stringifyBlocks, normalizeBlocks } from './utils/dslSchema';
@@ -411,6 +412,10 @@ function App() {
 
   if (pathname === '/prompts') {
     return <PromptsPage onNavigate={navigate} />;
+  }
+
+  if (pathname === '/ai') {
+    return <AIAgentsPage onNavigate={navigate} />;
   }
 
   return (
@@ -907,6 +912,29 @@ function App() {
             <span>{resume ? 'Resume Session' : 'Start Session'}</span>
           </button>
         </div>
+      )}
+
+      {!isFocusMode && (
+        <footer className="max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 mt-8 border-t border-(--border-color)/30">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs opacity-50 hover:opacity-70 transition-opacity">
+            <a
+              href="/llms.txt"
+              className="font-mono hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              For AI agents / LLMs
+            </a>
+            <span className="opacity-30">•</span>
+            <button
+              onClick={() => navigate('/ai')}
+              className="font-mono hover:underline"
+              type="button"
+            >
+              AI Integration Docs
+            </button>
+          </div>
+        </footer>
       )}
     </div>
   );
