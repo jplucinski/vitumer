@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
+Sitemap: https://vitumer.jplucinski.dev/sitemap.xml
 
-# LLM-readable documentation: /llms.txt
-# DSL reference (static HTML): /docs/dsl/
+# LLM documentation: https://vitumer.jplucinski.dev/llms.txt
