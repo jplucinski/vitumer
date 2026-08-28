@@ -19,6 +19,38 @@ function formatDuration(seconds) {
   return `${m}m ${s}s`;
 }
 
+function FlagToggle({ checked, onChange, label, hint }) {
+  return (
+    <label className="flex items-center justify-between gap-3 rounded-2xl border border-(--border-color) bg-(--block-color)/50 px-3 py-3 cursor-pointer">
+      <span className="text-xs min-w-0">
+        {label}
+        {hint ? <span className="block opacity-45 font-normal mt-0.5">{hint}</span> : null}
+      </span>
+      <span className="relative shrink-0 w-10 h-[22px] focus-within:ring-2 focus-within:ring-blue-500/40 rounded-full">
+        <input
+          type="checkbox"
+          role="switch"
+          checked={checked}
+          onChange={onChange}
+          className="sr-only"
+        />
+        <span
+          className={clsx(
+            'absolute inset-0 rounded-full transition-colors pointer-events-none',
+            checked ? 'bg-white' : 'bg-black/15 dark:bg-white/15'
+          )}
+        />
+        <span
+          className={clsx(
+            'absolute top-[2px] left-[2px] w-[18px] h-[18px] rounded-full shadow-sm transition-transform pointer-events-none',
+            checked ? 'translate-x-[18px] bg-black' : 'bg-white dark:bg-(--bg-color)'
+          )}
+        />
+      </span>
+    </label>
+  );
+}
+
 const BlockList = ({ blocks, setBlocks }) => {
   const [selectedBlock, setSelectedBlock] = useState(null);
   const [draft, setDraft] = useState({
@@ -30,6 +62,7 @@ const BlockList = ({ blocks, setBlocks }) => {
     color: 'orange',
     skippable: false,
     retryable: false,
+    hold: false,
   });
 
   useEffect(() => {
@@ -43,6 +76,7 @@ const BlockList = ({ blocks, setBlocks }) => {
         color: selectedBlock.color || 'orange',
         skippable: selectedBlock.skippable || false,
         retryable: selectedBlock.retryable || false,
+        hold: selectedBlock.hold || false,
       });
     }
   }, [selectedBlock]);
@@ -59,6 +93,7 @@ const BlockList = ({ blocks, setBlocks }) => {
       color: 'orange',
       skippable: false,
       retryable: false,
+      hold: false,
     };
     setBlocks((prev) => [...prev, newBlock]);
     setSelectedBlock(newBlock);
@@ -77,6 +112,7 @@ const BlockList = ({ blocks, setBlocks }) => {
               color: draft.color,
               skippable: draft.skippable,
               retryable: draft.retryable,
+              hold: draft.hold,
             }
           : block
       )
@@ -384,24 +420,24 @@ const BlockList = ({ blocks, setBlocks }) => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2.5 rounded-2xl border border-(--border-color) bg-(--block-color)/50 px-3 py-3 text-xs">
-                    <input
-                      type="checkbox"
-                      checked={draft.skippable}
-                      onChange={(e) => setDraft((prev) => ({ ...prev, skippable: e.target.checked }))}
-                      className="rounded border border-(--border-color) bg-(--block-color)"
+                  <FlagToggle
+                    checked={draft.skippable}
+                    onChange={(e) => setDraft((prev) => ({ ...prev, skippable: e.target.checked }))}
+                    label="Skippable"
+                  />
+                  <FlagToggle
+                    checked={draft.retryable}
+                    onChange={(e) => setDraft((prev) => ({ ...prev, retryable: e.target.checked }))}
+                    label="Retryable"
+                  />
+                  <div className="col-span-2">
+                    <FlagToggle
+                      checked={draft.hold}
+                      onChange={(e) => setDraft((prev) => ({ ...prev, hold: e.target.checked }))}
+                      label="Hold"
+                      hint="Wait for tap before next slot"
                     />
-                    Skippable
-                  </label>
-                  <label className="flex items-center gap-2.5 rounded-2xl border border-(--border-color) bg-(--block-color)/50 px-3 py-3 text-xs">
-                    <input
-                      type="checkbox"
-                      checked={draft.retryable}
-                      onChange={(e) => setDraft((prev) => ({ ...prev, retryable: e.target.checked }))}
-                      className="rounded border border-(--border-color) bg-(--block-color)"
-                    />
-                    Retryable
-                  </label>
+                  </div>
                 </div>
               </div>
             </div>

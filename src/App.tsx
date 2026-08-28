@@ -277,6 +277,7 @@ function App() {
     if (apiKey && aiAdvice.startsWith('Connect')) {
       generateAdvice();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when a key appears
   }, [apiKey]);
 
   const handleConsentSession = () => {
@@ -881,11 +882,15 @@ function App() {
             <div className="space-y-3 font-mono text-sm">
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="opacity-75">Space</span>
-                <span className="font-semibold text-(--color-primary)">Pause / Resume</span>
+                <span className="font-semibold text-(--color-primary)">Pause / resume · confirm next</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-white/5">
+                <span className="opacity-75">Enter</span>
+                <span className="font-semibold text-(--color-primary)">Confirm next slot</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="opacity-75">Right arrow</span>
-                <span className="font-semibold text-(--color-primary)">Next block (Skip)</span>
+                <span className="font-semibold text-(--color-primary)">Skip if skippable, or at hold gate</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="opacity-75">Left arrow</span>
@@ -893,7 +898,7 @@ function App() {
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="opacity-75">R</span>
-                <span className="font-semibold text-(--color-primary)">Restart block (Retry)</span>
+                <span className="font-semibold text-(--color-primary)">Retry if retryable, or at hold gate</span>
               </div>
               <div className="flex justify-between py-1 border-b border-white/5">
                 <span className="opacity-75">ESC</span>

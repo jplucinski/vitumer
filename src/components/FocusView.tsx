@@ -6,7 +6,7 @@ import { FlowBlock } from '../utils/dslParser';
 import { getColorBadgeClasses, getColorBorderClass, getColorPulseClass } from '../constants/blockOptions';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import { FOCUS_IMMERSIVE_QUERY } from '../constants/breakpoints';
-import { restoreTimerProgress, type TimerProgress } from '../utils/timerProgress';
+import { resolveTimerZeroAction, restoreTimerProgress, type RestoredTimer, type TimerProgress } from '../utils/timerProgress';
 
 const REST_LABELS = ['break', 'rest', 'przerwa', 'przerwa-kawa'];
 
@@ -25,12 +25,15 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  const [currentBlockIndex, setCurrentBlockIndex] = useState(() => {
-    const restoredInit = restoreTimerProgress(
+  const [restoredInit] = useState<RestoredTimer | null>(() =>
+    restoreTimerProgress(
       blocks,
       localStorage.getItem(STORAGE_KEYS.timerProgress),
       Date.now()
-    );
+    )
+  );
+
+  const [currentBlockIndex, setCurrentBlockIndex] = useState(() => {
     if (restoredInit) return restoredInit.blockIndex;
     const activeIdx = blocks.findIndex((b) => b.active);
     const nextIdx = activeIdx !== -1 ? activeIdx : blocks.findIndex((b) => !b.completed);
@@ -38,11 +41,6 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   });
 
   const [remainingSeconds, setRemainingSeconds] = useState(() => {
-    const restoredInit = restoreTimerProgress(
-      blocks,
-      localStorage.getItem(STORAGE_KEYS.timerProgress),
-      Date.now()
-    );
     if (restoredInit) return restoredInit.remainingSeconds;
     const activeIdx = blocks.findIndex((b) => b.active);
     const nextIdx = activeIdx !== -1 ? activeIdx : blocks.findIndex((b) => !b.completed);
@@ -50,17 +48,14 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     return blocks[idx]?.duration ?? 0;
   });
 
-  const [isPaused, setIsPaused] = useState(() => {
-    const restoredInit = restoreTimerProgress(
-      blocks,
-      localStorage.getItem(STORAGE_KEYS.timerProgress),
-      Date.now()
-    );
-    return restoredInit?.isPaused ?? true;
-  });
+  const [isPaused, setIsPaused] = useState(() => restoredInit?.isPaused ?? true);
+  const [awaitingNext, setAwaitingNext] = useState(() => restoredInit?.awaitingNext ?? false);
 
   const activeBlock = blocks[currentBlockIndex] || blocks[0];
   const isLastBlock = currentBlockIndex >= blocks.length - 1;
+  const nextBlock = blocks[currentBlockIndex + 1];
+  const canSkip = !isLastBlock && (Boolean(activeBlock?.skippable) || awaitingNext);
+  const canRetry = Boolean(activeBlock?.retryable) || awaitingNext;
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const persistEnabledRef = useRef(true);
@@ -97,6 +92,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     }
   };
 
+  // Mount-only: mark the restored index as active once.
   useEffect(() => {
     setBlocks((prev) =>
       prev.map((b, idx) => ({
@@ -104,10 +100,11 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
         active: idx === currentBlockIndex,
       }))
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only
   }, []);
 
   const handleBlockCompleted = () => {
-    playChime();
+    setAwaitingNext(false);
 
     setBlocks(prev => prev.map((b, idx) => {
       if (idx === currentBlockIndex) {
@@ -123,6 +120,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
       const nextIndex = currentBlockIndex + 1;
       setCurrentBlockIndex(nextIndex);
       setRemainingSeconds(blocks[nextIndex]?.duration ?? 0);
+      setIsPaused(false);
     } else {
       localStorage.removeItem(STORAGE_KEYS.timerProgress);
       setIsPaused(true);
@@ -144,28 +142,45 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
       if (remaining === 0) {
         if (timerRef.current) clearInterval(timerRef.current);
-        handleBlockCompleted();
+        playChime();
+        const hasNext = currentBlockIndex < blocks.length - 1;
+        if (resolveTimerZeroAction(blocks[currentBlockIndex], hasNext) === 'awaitNext') {
+          setAwaitingNext(true);
+          setIsPaused(true);
+          setRemainingSeconds(0);
+        } else {
+          handleBlockCompleted();
+        }
       }
     }, 100);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- interval identity is isPaused/index/remaining
   }, [isPaused, currentBlockIndex, remainingSeconds]);
 
   useEffect(() => {
     if (!persistEnabledRef.current || !activeBlock) return;
+    const atHoldGate =
+      awaitingNext ||
+      (remainingSeconds === 0 &&
+        resolveTimerZeroAction(activeBlock, currentBlockIndex < blocks.length - 1) === 'awaitNext');
     const progress: TimerProgress = {
       activeBlockId: activeBlock.id,
-      remainingSeconds,
+      remainingSeconds: atHoldGate ? 0 : remainingSeconds,
       lastTimestamp: Date.now(),
-      isPaused
+      isPaused: atHoldGate ? true : isPaused,
+      awaitingNext: atHoldGate
     };
     localStorage.setItem(STORAGE_KEYS.timerProgress, JSON.stringify(progress));
-  }, [remainingSeconds, isPaused, activeBlock]);
+  }, [remainingSeconds, isPaused, awaitingNext, activeBlock, currentBlockIndex, blocks.length]);
 
   const handleNext = () => {
+    if (!canSkip) return;
     if (currentBlockIndex < blocks.length - 1) {
+      const leaveGate = awaitingNext;
+      setAwaitingNext(false);
       const nextIndex = currentBlockIndex + 1;
       setBlocks((prev) =>
         prev.map((b, idx) => {
@@ -176,11 +191,13 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
       );
       setCurrentBlockIndex(nextIndex);
       setRemainingSeconds(blocks[nextIndex]?.duration ?? 0);
+      if (leaveGate) setIsPaused(false);
     }
   };
 
   const handlePrevious = () => {
     if (currentBlockIndex > 0) {
+      setAwaitingNext(false);
       const prevIndex = currentBlockIndex - 1;
       setBlocks((prev) =>
         prev.map((b, idx) => {
@@ -195,6 +212,8 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   };
 
   const retryBlock = () => {
+    if (!canRetry) return;
+    setAwaitingNext(false);
     if (activeBlock) {
       setRemainingSeconds(activeBlock.duration);
     }
@@ -208,6 +227,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
       active: false,
       completed: idx < currentBlockIndex ? true : b.completed
     })));
+    setAwaitingNext(false);
     toggleFocusMode();
   };
 
@@ -218,26 +238,33 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     setCurrentBlockIndex(0);
     setRemainingSeconds(blocks[0]?.duration ?? 0);
     setIsPaused(true);
+    setAwaitingNext(false);
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (awaitingNext && (e.code === 'Space' || e.key === 'Enter')) {
+        e.preventDefault();
+        handleBlockCompleted();
+        return;
+      }
       if (e.code === 'Space') {
         e.preventDefault();
         setIsPaused(p => !p);
-      } else if (e.key === 'ArrowRight' && currentBlockIndex < blocks.length - 1) {
+      } else if (e.key === 'ArrowRight' && canSkip) {
         handleNext();
       } else if (e.key === 'ArrowLeft') {
         handlePrevious();
       } else if (e.key === 'Escape') {
         handleStop();
-      } else if (e.key === 'r' || e.key === 'R') {
+      } else if ((e.key === 'r' || e.key === 'R') && canRetry) {
         retryBlock();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentBlockIndex, activeBlock, blocks.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handlers close over latest index/flags
+  }, [currentBlockIndex, activeBlock, blocks.length, awaitingNext, canSkip, canRetry]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -338,7 +365,12 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   return (
     <div className="focus-split mt-4 sm:mt-8 px-0 animate-in fade-in zoom-in-95 duration-300">
       <div className="focus-split-main">
-        <div className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center gap-6 w-full min-w-0 py-4">
+        <div
+          className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center gap-6 w-full min-w-0 py-4"
+          onClick={() => {
+            if (awaitingNext) handleBlockCompleted();
+          }}
+        >
           <div className="focus-split-mobile-chips flex-wrap items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-60 max-w-full px-2">
             <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
               {completedCount}/{blocks.length} done
@@ -352,6 +384,8 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               {completedCount}/{blocks.length} completed
             </span>
           </div>
+          {!(awaitingNext && nextBlock) && (
+            <>
           <div className={clsx(
             'focus-split-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono tracking-widest uppercase mb-4',
             getColorBadgeClasses(activeBlock?.color)
@@ -383,6 +417,27 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               style={{ width: `${progressPercent}%` }}
             />
           </div>
+            </>
+          )}
+
+          {awaitingNext && nextBlock && (
+            <div className="flex flex-col items-center gap-3 px-4 max-w-md w-full">
+              <p className="text-[10px] uppercase tracking-[0.2em] opacity-50 font-mono">
+                Tap · Space · Enter
+              </p>
+              <div
+                className={clsx(
+                  'w-full rounded-2xl border px-4 py-5 flex flex-col items-center gap-2 text-center',
+                  getColorBorderClass(nextBlock.color),
+                  getColorBadgeClasses(nextBlock.color)
+                )}
+              >
+                {nextBlock.emoji && <span className="text-3xl">{nextBlock.emoji}</span>}
+                <div className="font-mono font-bold">{nextBlock.label}</div>
+                <div className="text-xs opacity-70 font-mono">{formatTime(nextBlock.duration)}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="focus-controls flex flex-wrap items-center justify-center gap-2 sm:gap-3">
@@ -395,13 +450,20 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               <RefreshCcw size={20} />
             </button>
             <button
-              onClick={() => setIsPaused(p => !p)}
+              onClick={() => {
+                if (awaitingNext) {
+                  handleBlockCompleted();
+                  return;
+                }
+                setIsPaused(p => !p);
+              }}
               type="button"
-              aria-label={isPaused ? 'Play' : 'Pause'}
+              aria-label={awaitingNext ? 'Start next slot' : isPaused ? 'Play' : 'Pause'}
               className="focus-control-btn w-12 h-12 sm:w-14 sm:h-14 bg-black text-white dark:bg-white dark:text-black hover:scale-[1.02] shadow-xl border-transparent opacity-100"
             >
-              {isPaused ? <Play size={24} fill="currentColor" className="ml-1" /> : <Pause size={24} fill="currentColor" />}
+              {awaitingNext || isPaused ? <Play size={24} fill="currentColor" className="ml-1" /> : <Pause size={24} fill="currentColor" />}
             </button>
+            {canRetry && (
             <button
               onClick={retryBlock}
               title="Restart Block (R)"
@@ -410,6 +472,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             >
               <RotateCcw size={20} />
             </button>
+            )}
             <button
               onClick={handleStop}
               title="Exit Focus Mode (ESC)"
@@ -418,7 +481,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             >
               <Square size={20} />
             </button>
-            {!isLastBlock && (
+            {canSkip && (
               <button
                 onClick={handleNext}
                 title="Skip Block (Right Arrow)"

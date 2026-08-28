@@ -37,6 +37,7 @@ Optional fields per block:
 - "description": block description (only when the user request implies activity detail)
 - "skippable": boolean (only when skip makes sense)
 - "retryable": boolean (only when retry makes sense)
+- "hold": boolean (only when the next slot must wait for tap/Space/Enter after this block)
 
 Each item in "suggestions" must include:
 - "label": short chip label (2-4 words, max ~22 chars)
@@ -49,7 +50,8 @@ const BLOCK_FIELD_RULES = `Field rules:
 - color: required. Rest/break labels → teal. Focus/work → orange. Override when task implies (meditation → purple).
 - label: short, lowercase, DSL-friendly: pomo, break, work, rest, warmup, cooldown.
 - description: include only when user request implies activity detail; omit for generic HIIT/pomodoro.
-- skippable/retryable: only when user mentions skip/retry or block type warrants it.`;
+- skippable/retryable: only when user mentions skip/retry or block type warrants it.
+- hold: only when the user asks to wait / confirm before the next slot.`;
 
 const BLOCK_SUGGESTION_RULES = `Suggestion rules:
 - Exactly 3-4 chips, English only, no duplicates.
@@ -66,6 +68,7 @@ const BLOCK_DSL_MAP = `JSON-to-DSL mapping (for your reference when choosing fie
 - description → {Deep reading}
 - skippable → [skippable]
 - retryable → [retry]
+- hold → [hold]
 Return fully expanded blocks, never loop shorthand like 3 * (...).`;
 
 const BLOCK_EXAMPLES = `Example for "3 study sessions of 25 min with 5 min breaks":

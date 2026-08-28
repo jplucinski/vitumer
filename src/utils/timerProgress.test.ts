@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { TIMER_PROGRESS_TTL_MS, formatClock, restoreTimerProgress } from './timerProgress';
+import {
+  TIMER_PROGRESS_TTL_MS,
+  formatClock,
+  parseTimerProgress,
+  resolveTimerZeroAction,
+  restoreTimerProgress,
+} from './timerProgress';
 
 const blocks = [
   { id: '1', duration: 1500 },
@@ -19,6 +25,7 @@ describe('restoreTimerProgress', () => {
       blockIndex: 1,
       remainingSeconds: 215,
       isPaused: true,
+      awaitingNext: false,
     });
   });
 
@@ -28,6 +35,7 @@ describe('restoreTimerProgress', () => {
       blockIndex: 1,
       remainingSeconds: 205,
       isPaused: false,
+      awaitingNext: false,
     });
   });
 
@@ -37,6 +45,7 @@ describe('restoreTimerProgress', () => {
       blockIndex: 1,
       remainingSeconds: 0,
       isPaused: false,
+      awaitingNext: false,
     });
   });
 
@@ -64,6 +73,53 @@ describe('restoreTimerProgress', () => {
     expect(restoreTimerProgress(blocks, null, 1_000_000)).toBeNull();
     expect(restoreTimerProgress(blocks, '{', 1_000_000)).toBeNull();
     expect(restoreTimerProgress(blocks, JSON.stringify({ activeBlockId: '2' }), 1_000_000)).toBeNull();
+  });
+
+  it('restores a hold gate without subtracting elapsed', () => {
+    const gated = {
+      activeBlockId: '1',
+      remainingSeconds: 0,
+      lastTimestamp: 1_000_000,
+      isPaused: false,
+      awaitingNext: true,
+    };
+    expect(restoreTimerProgress(blocks, JSON.stringify(gated), 1_000_000 + 30_000)).toEqual({
+      blockIndex: 0,
+      remainingSeconds: 0,
+      isPaused: true,
+      awaitingNext: true,
+    });
+  });
+});
+
+describe('parseTimerProgress awaitingNext', () => {
+  it('coerces non-boolean awaitingNext to false', () => {
+    const parsed = parseTimerProgress(
+      JSON.stringify({
+        activeBlockId: '1',
+        remainingSeconds: 10,
+        lastTimestamp: 1,
+        isPaused: true,
+        awaitingNext: 'yes',
+      })
+    );
+    expect(parsed?.awaitingNext).toBe(false);
+  });
+});
+
+describe('resolveTimerZeroAction', () => {
+  it('awaits next when hold and a successor exist', () => {
+    expect(resolveTimerZeroAction({ hold: true }, true)).toBe('awaitNext');
+  });
+
+  it('completes the last block even with hold', () => {
+    expect(resolveTimerZeroAction({ hold: true }, false)).toBe('complete');
+  });
+
+  it('completes when hold is absent or false', () => {
+    expect(resolveTimerZeroAction({}, true)).toBe('complete');
+    expect(resolveTimerZeroAction({ hold: false }, true)).toBe('complete');
+    expect(resolveTimerZeroAction(undefined, true)).toBe('complete');
   });
 });
 
