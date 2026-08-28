@@ -332,7 +332,8 @@
 }
 
 .focus-split-desktop-chips,
-.focus-split-desktop-progress {
+.focus-split-desktop-progress,
+.focus-split-immersive-progress {
   display: none;
 }
 
@@ -373,6 +374,71 @@
 
   .focus-split-desktop-progress {
     display: block;
+  }
+}
+
+/* Keep in sync with FOCUS_IMMERSIVE_QUERY in src/constants/breakpoints.ts */
+@media (orientation: landscape) and (max-height: 639px) {
+  .focus-split {
+    margin-top: 0;
+    min-height: 100dvh;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+  }
+
+  .focus-split-main {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    min-height: 0;
+    width: auto;
+  }
+
+  .focus-split-stage {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .focus-controls {
+    order: -1;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    padding-top: 0;
+    max-height: 100%;
+  }
+
+  .focus-split-mobile-chips,
+  .focus-split-mobile-timeline,
+  .focus-split-sidebar,
+  .focus-split-backdrop,
+  .focus-split-sheet {
+    display: none;
+  }
+
+  .focus-split-immersive-progress {
+    display: block;
+    width: 100%;
+    max-width: 20rem;
+    margin-inline: auto;
+  }
+
+  .app-container.is-focus-mode .app-header {
+    display: none;
+  }
+
+  .app-container.is-focus-mode .app-main {
+    padding-bottom: 0;
+    max-width: none;
   }
 }
 
