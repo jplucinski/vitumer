@@ -338,7 +338,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   return (
     <div className="focus-split mt-4 sm:mt-8 px-0 animate-in fade-in zoom-in-95 duration-300">
       <div className="focus-split-main">
-        <div className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center space-y-6 w-full min-w-0 py-4">
+        <div className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center gap-6 w-full min-w-0 py-4">
           <div className="focus-split-mobile-chips flex-wrap items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-60 max-w-full px-2">
             <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
               {completedCount}/{blocks.length} done
@@ -353,14 +353,14 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             </span>
           </div>
           <div className={clsx(
-            'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono tracking-widest uppercase mb-4',
+            'focus-split-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono tracking-widest uppercase mb-4',
             getColorBadgeClasses(activeBlock?.color)
           )}>
             {activeBlock?.emoji && <span>{activeBlock.emoji}</span>}
             {activeBlock?.label || 'No block'}
           </div>
           {activeBlock?.description && (
-            <div className="text-sm opacity-60 font-mono -mt-4 mb-2 max-w-[90vw] md:max-w-md line-clamp-2 px-4">
+            <div className="focus-split-description text-sm opacity-60 font-mono -mt-4 mb-2 max-w-[90vw] md:max-w-md line-clamp-2 px-4">
               {activeBlock.description}
             </div>
           )}
