@@ -5,13 +5,17 @@ export type TimerProgress = {
   remainingSeconds: number;
   lastTimestamp: number;
   isPaused: boolean;
+  awaitingNext?: boolean;
 };
 
 export type RestoredTimer = {
   blockIndex: number;
   remainingSeconds: number;
   isPaused: boolean;
+  awaitingNext: boolean;
 };
+
+export type TimerZeroAction = 'complete' | 'awaitNext';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -33,7 +37,8 @@ export function parseTimerProgress(raw: string | null): TimerProgress | null {
     ) {
       return null;
     }
-    return { activeBlockId, remainingSeconds, lastTimestamp, isPaused };
+    const awaitingNext = parsed.awaitingNext === true;
+    return { activeBlockId, remainingSeconds, lastTimestamp, isPaused, awaitingNext };
   } catch {
     return null;
   }
@@ -52,6 +57,15 @@ export function restoreTimerProgress(
   if (blockIndex === -1) return null;
   if (now - progress.lastTimestamp >= ttlMs) return null;
 
+  if (progress.awaitingNext) {
+    return {
+      blockIndex,
+      remainingSeconds: 0,
+      isPaused: true,
+      awaitingNext: true,
+    };
+  }
+
   let remainingSeconds = progress.remainingSeconds;
   if (!progress.isPaused) {
     const elapsed = Math.floor((now - progress.lastTimestamp) / 1000);
@@ -62,7 +76,16 @@ export function restoreTimerProgress(
     blockIndex,
     remainingSeconds,
     isPaused: progress.isPaused,
+    awaitingNext: false,
   };
+}
+
+export function resolveTimerZeroAction(
+  block: { hold?: boolean } | undefined,
+  hasNextBlock: boolean
+): TimerZeroAction {
+  if (block?.hold === true && hasNextBlock) return 'awaitNext';
+  return 'complete';
 }
 
 export function formatClock(totalSeconds: number): string {
