@@ -1,0 +1,126 @@
+<h2>Gate po [hold] — który layout?</h2>
+<p class="subtitle">Zegar skończonego slotu vs karta następnego (emoji / kolor / label / czas). Tap / Space / Enter startuje next.</p>
+
+<style>
+  .phone {
+    width: 220px;
+    margin: 0 auto;
+    background: #12141a;
+    color: #e8e6e1;
+    border-radius: 20px;
+    padding: 16px 14px 18px;
+    font-family: ui-monospace, monospace;
+    text-align: center;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .chip {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+  .clock {
+    font-size: 42px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .clock-dim { opacity: 0.28; font-size: 28px; }
+  .prompt { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.55; }
+  .next-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    width: 100%;
+    border: 1px solid rgba(45, 212, 191, 0.45);
+    background: rgba(45, 212, 191, 0.08);
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+  .dot {
+    width: 22px; height: 22px; border-radius: 999px;
+    border: 2px solid #2dd4bf; flex-shrink: 0;
+  }
+  .nl { font-size: 13px; font-weight: 700; }
+  .nd { font-size: 11px; opacity: 0.65; }
+  .done { font-size: 11px; opacity: 0.4; }
+  .controls { display: flex; gap: 6px; margin-top: 6px; opacity: 0.35; }
+  .btn { width: 28px; height: 28px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15); }
+  .btn-main { width: 36px; height: 36px; background: #fff; }
+</style>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="phone">
+        <div class="chip">1/4 done</div>
+        <div class="done">☕ work</div>
+        <div class="clock">00:00</div>
+        <div class="prompt">Start next slot?</div>
+        <div class="next-card">
+          <div class="dot"></div>
+          <div>
+            <div class="nl">☕ rest</div>
+            <div class="nd">5m</div>
+          </div>
+        </div>
+        <div class="controls"><div class="btn"></div><div class="btn btn-main"></div><div class="btn"></div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — zegar zostaje</h3>
+      <p>00:00 hero. Karta next pod spodem. Najmniej ruchu w layoutcie focus.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="phone">
+        <div class="chip">1/4 done</div>
+        <div class="prompt">Start next slot?</div>
+        <div class="next-card" style="padding: 16px 14px;">
+          <div class="dot" style="width:28px;height:28px;"></div>
+          <div>
+            <div class="nl" style="font-size:16px;">☕ rest</div>
+            <div class="nd">5m</div>
+          </div>
+        </div>
+        <div class="clock-dim">00:00</div>
+        <div class="done">work finished</div>
+        <div class="controls"><div class="btn"></div><div class="btn btn-main"></div><div class="btn"></div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — next jest hero</h3>
+      <p>Pytanie o następny slot. Skończony timer schodzi na dół.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="phone">
+        <div class="chip">tap · space · enter</div>
+        <div class="next-card" style="flex-direction:column;align-items:center;text-align:center;padding:20px 12px;gap:8px;">
+          <div class="prompt" style="opacity:0.7;">Next</div>
+          <div style="font-size:28px;">☕</div>
+          <div class="nl" style="font-size:18px;">rest</div>
+          <div class="nd">5m</div>
+        </div>
+        <div class="controls"><div class="btn"></div><div class="btn btn-main"></div><div class="btn"></div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — tylko next</h3>
+      <p>Zero zegara. Pełny hint jak karta timeline, bez 00:00.</p>
+    </div>
+  </div>
+</div>
