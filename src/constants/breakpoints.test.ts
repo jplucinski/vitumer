@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   BREAKPOINTS,
   FOCUS_SPLIT_QUERY,
+  FOCUS_IMMERSIVE_MAX_HEIGHT,
+  FOCUS_IMMERSIVE_QUERY,
   WIDE_LAYOUT_QUERY,
+  isFocusImmersiveLayout,
   isFocusSplitLayout,
   isWideLayout,
 } from './breakpoints';
@@ -57,5 +60,36 @@ describe('media query strings', () => {
   it('embed the same numbers CSS will use', () => {
     expect(WIDE_LAYOUT_QUERY).toBe('(min-width: 1024px)');
     expect(FOCUS_SPLIT_QUERY).toBe('(min-width: 1024px) and (min-height: 640px)');
+  });
+});
+
+describe('isFocusImmersiveLayout', () => {
+  it('is true for phone landscape (wide-ish, short)', () => {
+    expect(isFocusImmersiveLayout(812, 375)).toBe(true);
+    expect(isFocusImmersiveLayout(844, 390)).toBe(true);
+  });
+
+  it('is false for phone portrait', () => {
+    expect(isFocusImmersiveLayout(375, 812)).toBe(false);
+  });
+
+  it('is false when split applies', () => {
+    expect(isFocusImmersiveLayout(1024, 640)).toBe(false);
+    expect(isFocusSplitLayout(1024, 640)).toBe(true);
+  });
+
+  it('is true for lg width with short height (not split)', () => {
+    expect(isFocusImmersiveLayout(1280, 600)).toBe(true);
+    expect(isFocusSplitLayout(1280, 600)).toBe(false);
+  });
+});
+
+describe('FOCUS_IMMERSIVE_QUERY', () => {
+  it('embeds landscape + max-height one below split min height', () => {
+    expect(FOCUS_IMMERSIVE_MAX_HEIGHT).toBe(BREAKPOINTS.focusSplitMinHeight - 1);
+    expect(FOCUS_IMMERSIVE_QUERY).toBe(
+      `(orientation: landscape) and (max-height: ${FOCUS_IMMERSIVE_MAX_HEIGHT}px)`
+    );
+    expect(FOCUS_IMMERSIVE_QUERY).toBe('(orientation: landscape) and (max-height: 639px)');
   });
 });
