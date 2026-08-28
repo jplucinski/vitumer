@@ -424,8 +424,12 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen app-container transition-colors duration-300">
-      <header className="max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 flex justify-between items-center gap-4 border-b border-(--border-color)/50">
+    <div
+      className={`min-h-screen app-container transition-colors duration-300${
+        isFocusMode ? ' is-focus-mode' : ''
+      }`}
+    >
+      <header className="app-header max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 flex justify-between items-center gap-4 border-b border-(--border-color)/50">
         <h1 className="app-title">Vitumer</h1>
         <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
           <div className="hidden sm:block text-xs font-mono">
@@ -482,7 +486,7 @@ function App() {
       </header>
 
       <main
-        className={`max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 grow ${
+        className={`app-main max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 grow ${
           isDesktop ? 'pb-10' : 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]'
         }`}
       >

@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { FlowBlock } from '../utils/dslParser';
 import { getColorBadgeClasses, getColorBorderClass, getColorPulseClass } from '../constants/blockOptions';
 import { STORAGE_KEYS } from '../constants/storageKeys';
+import { FOCUS_IMMERSIVE_QUERY } from '../constants/breakpoints';
 import { restoreTimerProgress, type TimerProgress } from '../utils/timerProgress';
 
 const REST_LABELS = ['break', 'rest', 'przerwa', 'przerwa-kawa'];
@@ -238,6 +239,17 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentBlockIndex, activeBlock, blocks.length]);
 
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia(FOCUS_IMMERSIVE_QUERY);
+    const closeIfImmersive = () => {
+      if (media.matches) setIsTimelineOpen(false);
+    };
+    closeIfImmersive();
+    media.addEventListener('change', closeIfImmersive);
+    return () => media.removeEventListener('change', closeIfImmersive);
+  }, []);
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -326,7 +338,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   return (
     <div className="focus-split mt-4 sm:mt-8 px-0 animate-in fade-in zoom-in-95 duration-300">
       <div className="focus-split-main">
-        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 w-full min-w-0 py-4">
+        <div className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center space-y-6 w-full min-w-0 py-4">
           <div className="focus-split-mobile-chips flex-wrap items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-60 max-w-full px-2">
             <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
               {completedCount}/{blocks.length} done
@@ -365,7 +377,15 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             </div>
           </div>
 
-          <div className="focus-controls flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="focus-split-immersive-progress w-full max-w-md h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-linear shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="focus-controls flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             <button
               onClick={resetSession}
               title="Reset Session"
@@ -417,7 +437,6 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </button>
           </div>
-        </div>
 
         <div className="focus-split-mobile-timeline w-full shrink-0 mt-2 rounded-2xl border border-(--border-color) overflow-hidden bg-(--block-color)/50">
           <button
