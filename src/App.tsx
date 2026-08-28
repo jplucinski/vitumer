@@ -403,6 +403,11 @@ function App() {
     }
   };
 
+  const persistModelId = (id: string) => {
+    setModelId(id);
+    localStorage.setItem('openrouter_model_id', id);
+  };
+
   const saveSettings = () => {
     localStorage.setItem('openrouter_model_id', modelId);
     localStorage.setItem(STORAGE_KEYS.theme, theme);
@@ -541,7 +546,14 @@ function App() {
 
             {/* AI column — right at lg, first on mobile */}
             <div className="order-1 lg:order-none lg:col-start-2 min-w-0">
-              <CommandBar setBlocks={setBlocks} apiKey={apiKey} modelId={modelId} promptMode={promptMode} />
+              <CommandBar
+                setBlocks={setBlocks}
+                apiKey={apiKey}
+                modelId={modelId}
+                promptMode={promptMode}
+                onOpenSettings={() => setShowSettings(true)}
+                onModelChange={persistModelId}
+              />
             </div>
           </div>
         )}
@@ -640,7 +652,7 @@ function App() {
 
               <div>
                 <label className="block text-xs opacity-50 mb-1">Default Model ID (OpenRouter)</label>
-                <ModelPicker value={modelId} onChange={setModelId} apiKey={apiKey} />
+                <ModelPicker value={modelId} onChange={persistModelId} apiKey={apiKey} />
               </div>
 
               <div className="pt-2">

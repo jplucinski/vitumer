@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlowBlock } from '../utils/dslParser';
 import {
   buildConversationMessages,
   generateBlocksFromConversation,
 } from '../utils/aiService';
+import { AI_CALL_COPY, AiCallError, normalizeAiCallError } from '../utils/aiCallError';
 import { inferDefaultColor, normalizeColor } from '../constants/blockOptions';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import { PromptMode } from '../constants/aiPrompts';
@@ -80,7 +81,8 @@ export function useAISessionThread({
   const [thread, setThread] = useState<AISessionThread>(() => loadThread());
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingTurnId, setThinkingTurnId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AiCallError | null>(null);
+  const lastFailedPromptRef = useRef<string | null>(null);
 
   useEffect(() => {
     persistThread(thread);
@@ -93,7 +95,7 @@ export function useAISessionThread({
   const runGeneration = useCallback(
     async (turnsBeforeNew: AITurn[], userMessage: string) => {
       if (!apiKey) {
-        throw new Error('Connect OpenRouter in Settings to generate a session with AI.');
+        throw new AiCallError('auth', AI_CALL_COPY.noKey);
       }
 
       const messages = buildConversationMessages(turnsBeforeNew);
@@ -111,7 +113,7 @@ export function useAISessionThread({
 
       const blocks = normalizeBlocks(response.blocks);
       if (blocks.length === 0) {
-        throw new Error('AI did not generate any blocks. Try a different prompt.');
+        throw new AiCallError('empty', AI_CALL_COPY.emptyBlocks);
       }
 
       return {
@@ -127,6 +129,12 @@ export function useAISessionThread({
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed || isThinking) return;
+
+      if (!apiKey) {
+        lastFailedPromptRef.current = trimmed;
+        setError(new AiCallError('auth', AI_CALL_COPY.noKey));
+        return;
+      }
 
       setIsThinking(true);
       setError(null);
@@ -152,24 +160,26 @@ export function useAISessionThread({
       try {
         const { reasoning, blocks, suggestions } = await runGeneration(turnsBeforeNew, trimmed);
 
+        lastFailedPromptRef.current = null;
         updateThread((prev) => ({
           ...prev,
           turns: prev.turns.map((t) =>
             t.id === turnId ? { ...t, reasoning, blocks, suggestions } : t
           ),
         }));
-      } catch (err: any) {
+      } catch (err: unknown) {
         updateThread((prev) => ({
           ...prev,
           turns: prev.turns.filter((t) => t.id !== turnId),
         }));
-        setError(err.message ?? 'AI generation failed.');
+        lastFailedPromptRef.current = trimmed;
+        setError(normalizeAiCallError(err));
       } finally {
         setIsThinking(false);
         setThinkingTurnId(null);
       }
     },
-    [isThinking, runGeneration, thread.turns, updateThread]
+    [apiKey, isThinking, runGeneration, thread.turns, updateThread]
   );
 
   const editAndResend = useCallback(
@@ -179,6 +189,12 @@ export function useAISessionThread({
 
       const turnIndex = thread.turns.findIndex((t) => t.id === existingTurnId);
       if (turnIndex === -1) return;
+
+      if (!apiKey) {
+        lastFailedPromptRef.current = trimmed;
+        setError(new AiCallError('auth', AI_CALL_COPY.noKey));
+        return;
+      }
 
       setIsThinking(true);
       setError(null);
@@ -204,24 +220,26 @@ export function useAISessionThread({
       try {
         const { reasoning, blocks, suggestions } = await runGeneration(turnsBefore, trimmed);
 
+        lastFailedPromptRef.current = null;
         updateThread((prev) => ({
           ...prev,
           turns: prev.turns.map((t) =>
             t.id === newTurnId ? { ...t, reasoning, blocks, suggestions } : t
           ),
         }));
-      } catch (err: any) {
+      } catch (err: unknown) {
         updateThread((prev) => ({
           ...prev,
           turns: prev.turns.filter((t) => t.id !== newTurnId),
         }));
-        setError(err.message ?? 'AI generation failed.');
+        lastFailedPromptRef.current = trimmed;
+        setError(normalizeAiCallError(err));
       } finally {
         setIsThinking(false);
         setThinkingTurnId(null);
       }
     },
-    [isThinking, runGeneration, thread.turns, updateThread]
+    [apiKey, isThinking, runGeneration, thread.turns, updateThread]
   );
 
   const acceptTurn = useCallback(
@@ -250,11 +268,19 @@ export function useAISessionThread({
   const resetThread = useCallback(() => {
     setThread({ turns: [], startedAt: Date.now() });
     setError(null);
+    lastFailedPromptRef.current = null;
   }, []);
 
   const clearError = useCallback(() => {
     setError(null);
+    lastFailedPromptRef.current = null;
   }, []);
+
+  const retry = useCallback(async () => {
+    const prompt = lastFailedPromptRef.current;
+    if (!prompt || isThinking) return;
+    await sendMessage(prompt);
+  }, [isThinking, sendMessage]);
 
   const latestPendingTurn = [...thread.turns].reverse().find((t) => t.status === 'pending');
 
@@ -270,5 +296,6 @@ export function useAISessionThread({
     rejectTurn,
     resetThread,
     clearError,
+    retry,
   };
 }
