@@ -19,6 +19,17 @@ function staticOAuthCallback() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    host: true,
+    port: 5173,
+    watch: process.env.DEVCONTAINER || process.env.REMOTE_CONTAINERS
+      ? { usePolling: true }
+      : undefined,
+  },
+  preview: {
+    host: true,
+    port: 4173,
+  },
   plugins: [
     react(),
     tailwindcss(),
