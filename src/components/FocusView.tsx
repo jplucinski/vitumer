@@ -92,6 +92,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     }
   };
 
+  // Mount-only: mark the restored index as active once.
   useEffect(() => {
     setBlocks((prev) =>
       prev.map((b, idx) => ({
@@ -99,6 +100,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
         active: idx === currentBlockIndex,
       }))
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only
   }, []);
 
   const handleBlockCompleted = () => {
@@ -155,6 +157,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- interval identity is isPaused/index/remaining
   }, [isPaused, currentBlockIndex, remainingSeconds]);
 
   useEffect(() => {
@@ -260,6 +263,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handlers close over latest index/flags
   }, [currentBlockIndex, activeBlock, blocks.length, awaitingNext, canSkip, canRetry]);
 
   useEffect(() => {

@@ -23,6 +23,12 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    files: ['vite.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
     files: ['**/*.{ts,tsx}'],
