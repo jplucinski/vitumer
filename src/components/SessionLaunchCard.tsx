@@ -68,20 +68,22 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
               {allCompleted ? (
                 <p className="text-sm opacity-60 font-mono">All blocks completed — reset to run again.</p>
               ) : (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono uppercase tracking-wider opacity-40">Next</span>
-                  <span
-                    className={clsx(
-                      'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wide uppercase',
-                      getColorBadgeClasses(displayBlock?.color)
-                    )}
-                  >
-                    {displayBlock?.emoji && <span>{displayBlock.emoji}</span>}
-                    {displayBlock?.label}
-                    <span className="opacity-70 normal-case">· {displayDuration}</span>
-                  </span>
+                <div className="space-y-1.5 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-mono uppercase tracking-wider opacity-40">Next</span>
+                    <span
+                      className={clsx(
+                        'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wide uppercase',
+                        getColorBadgeClasses(displayBlock?.color)
+                      )}
+                    >
+                      {displayBlock?.emoji && <span>{displayBlock.emoji}</span>}
+                      {displayBlock?.label}
+                      <span className="opacity-70 normal-case">· {displayDuration}</span>
+                    </span>
+                  </div>
                   {displayBlock?.description && (
-                    <span className="text-xs font-mono opacity-50 truncate max-w-xs">{displayBlock.description}</span>
+                    <p className="text-xs font-mono opacity-50 leading-relaxed">{displayBlock.description}</p>
                   )}
                 </div>
               )}
