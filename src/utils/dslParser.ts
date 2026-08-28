@@ -11,6 +11,7 @@ export interface FlowBlock {
   emoji?: string;
   skippable?: boolean;
   retryable?: boolean;
+  hold?: boolean;
   active?: boolean;
 }
 
@@ -103,6 +104,7 @@ export function parseDSL(dslText: string): FlowBlock[] {
     let emoji: string | undefined;
     let skippable: boolean | undefined;
     let retryable: boolean | undefined;
+    let hold: boolean | undefined;
 
     const attrMatch = remainder.match(/\[([^\]]+)\]/);
     if (attrMatch) {
@@ -117,9 +119,11 @@ export function parseDSL(dslText: string): FlowBlock[] {
           else if (key === 'emoji') emoji = val;
           else if (key === 'skippable') skippable = val === 'true';
           else if (key === 'retry' || key === 'retryable') retryable = val === 'true';
+          else if (key === 'hold') hold = val === 'true';
         } else {
           if (attr === 'skippable') skippable = true;
           else if (attr === 'retry' || attr === 'retryable') retryable = true;
+          else if (attr === 'hold') hold = true;
         }
       }
     }
@@ -136,7 +140,8 @@ export function parseDSL(dslText: string): FlowBlock[] {
       description,
       emoji,
       skippable,
-      retryable
+      retryable,
+      hold
     });
   }
 

@@ -19,7 +19,7 @@ Loop:
   N * (block + block + ...)
 
 Attributes (per block, inside [...]):
-  color, emoji, skippable, retry
+  color, emoji, skippable, retry, hold
 
 Time units:
   h = hours, m = minutes, s = seconds
@@ -91,7 +91,7 @@ Vitumer uses a compact system prompt by default to save tokens. Users can enable
 "Detailed AI prompts" in Settings for a verbose variant that includes few-shot
 examples (better for complex rituals or multi-step schedules). Both modes require
 emoji and color on every block. Optional fields map to DSL attributes: description
-{...}, [skippable], [retry], [color:...], [emoji:...].
+{...}, [skippable], [retry], [hold], [color:...], [emoji:...].
 
 Example user request:
   "3 study sessions of 25 min with 5 min breaks"

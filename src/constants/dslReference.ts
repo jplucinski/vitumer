@@ -8,7 +8,7 @@ export const DSL_SYNTAX_LINES = [
   'Block: {duration}{h|m|s} {label} {optional description} [optional attributes]',
   'Sequence: block + block + ...',
   'Loop: N * (block + block + ...)',
-  'Attributes go on each block inside [...]: color, emoji, skippable, retry',
+  'Attributes go on each block inside [...]: color, emoji, skippable, retry, hold',
   'Units: h (hours), m (minutes), s (seconds)',
 ] as const;
 
@@ -37,6 +37,10 @@ export const DSL_REFERENCE_EXAMPLES: DslReferenceExample[] = [
   {
     title: 'Pomodoro',
     dsl: '3 * (25m pomo [color:orange] + 5m break [color:teal])',
+  },
+  {
+    title: 'Hold before next',
+    dsl: '25m work [hold] + 5m rest [color:teal]',
   },
 ];
 

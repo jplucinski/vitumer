@@ -89,7 +89,7 @@
         <li><strong>Block:</strong> <code>{duration}{h|m|s} {label} {optional description} [optional attributes]</code></li>
         <li><strong>Sequence:</strong> <code>block + block + ...</code></li>
         <li><strong>Loop:</strong> <code>N * (block + block + ...)</code></li>
-        <li><strong>Attributes</strong> (per block): <code>color</code>, <code>emoji</code>, <code>skippable</code>, <code>retry</code></li>
+        <li><strong>Attributes</strong> (per block): <code>color</code>, <code>emoji</code>, <code>skippable</code>, <code>retry</code>, <code>hold</code></li>
         <li><strong>Units:</strong> <code>h</code> hours, <code>m</code> minutes, <code>s</code> seconds</li>
         <li><strong>Colors:</strong> orange, teal, blue, purple, rose, amber</li>
       </ul>
@@ -124,6 +124,11 @@
       <div class="example">
         <div class="example-title">Pomodoro</div>
         <pre>3 * (25m pomo [color:orange] + 5m break [color:teal])</pre>
+      </div>
+
+      <div class="example">
+        <div class="example-title">Hold before next</div>
+        <pre>25m work [hold] + 5m rest [color:teal]</pre>
       </div>
 
       <h2>Shareable links</h2>
