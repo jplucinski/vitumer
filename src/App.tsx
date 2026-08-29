@@ -178,11 +178,12 @@ function App() {
     const flowParam = new URLSearchParams(window.location.search).get('flow');
     if (flowParam) {
       try {
-        const parsed = parseDSL(decodeURIComponent(escape(atob(flowParam))));
+        const parsed = parseDSL(decodeFlowParam(flowParam));
         if (parsed.length > 0) {
           const normalized = normalizeBlocks(parsed);
           setBlocks(normalized);
           localStorage.setItem(STORAGE_KEYS.activeBlocks, JSON.stringify(normalized));
+          setBlocksHydrated(true);
           return;
         }
       } catch (err) {
@@ -205,13 +206,15 @@ function App() {
         console.error('Failed to load saved blocks from localStorage', err);
       }
     }
+    setBlocksHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!blocksHydrated) return;
     if (blocks && blocks.length > 0) {
       localStorage.setItem(STORAGE_KEYS.activeBlocks, JSON.stringify(blocks));
     }
-  }, [blocks]);
+  }, [blocks, blocksHydrated]);
 
   useEffect(() => {
     setResume(
@@ -397,9 +400,7 @@ function App() {
 
   const shareAsQr = () => {
     try {
-      const dsl = stringifyBlocks(blocks);
-      const base64 = btoa(unescape(encodeURIComponent(dsl)));
-      const url = `${window.location.origin}/?flow=${base64}`;
+      const url = buildShareUrl(window.location.origin, stringifyBlocks(blocks));
       setShareUrl(url);
       setShowQrModal(true);
     } catch {
