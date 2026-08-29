@@ -24,6 +24,7 @@ import AIAgentsPage from './components/AIAgentsPage';
 import { ModelPicker } from './components/ModelPicker';
 import { FlowBlock, parseDSL } from './utils/dslParser';
 import { stringifyBlocks, normalizeBlocks } from './utils/dslSchema';
+import { buildShareUrl, decodeFlowParam } from './utils/shareFlow';
 import {
   getStoredApiKey,
   storeApiKeySession,
@@ -117,6 +118,7 @@ function App() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem(STORAGE_KEYS.colorMode) !== 'light');
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [blocks, setBlocks] = useState<FlowBlock[]>(MOCK_BLOCKS);
+  const [blocksHydrated, setBlocksHydrated] = useState(false);
   const [resume, setResume] = useState<RestoredTimer | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
