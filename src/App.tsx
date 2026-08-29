@@ -123,6 +123,7 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem(STORAGE_KEYS.theme) || 'aura');
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [modelId, setModelId] = useState(localStorage.getItem('openrouter_model_id') || 'openai/gpt-4o-mini');
+  const [modelLabel, setModelLabel] = useState(localStorage.getItem('openrouter_model_label') || '');
   const [promptMode, setPromptMode] = useState<PromptMode>(() => loadPromptMode());
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [oauthLoading, setOauthLoading] = useState(false);
@@ -404,13 +405,18 @@ function App() {
     }
   };
 
-  const persistModelId = (id: string) => {
+  const persistModelId = (id: string, label?: string) => {
     setModelId(id);
     localStorage.setItem('openrouter_model_id', id);
+    if (label !== undefined) {
+      setModelLabel(label);
+      localStorage.setItem('openrouter_model_label', label);
+    }
   };
 
   const saveSettings = () => {
     localStorage.setItem('openrouter_model_id', modelId);
+    localStorage.setItem('openrouter_model_label', modelLabel);
     localStorage.setItem(STORAGE_KEYS.theme, theme);
     savePromptMode(promptMode);
     setShowSettings(false);
@@ -555,6 +561,7 @@ function App() {
                 setBlocks={setBlocks}
                 apiKey={apiKey}
                 modelId={modelId}
+                modelLabel={modelLabel}
                 promptMode={promptMode}
                 onOpenSettings={() => setShowSettings(true)}
                 onModelChange={persistModelId}
@@ -657,7 +664,12 @@ function App() {
 
               <div>
                 <label className="block text-xs opacity-50 mb-1">Default Model ID (OpenRouter)</label>
-                <ModelPicker value={modelId} onChange={persistModelId} apiKey={apiKey} />
+                <ModelPicker
+                  value={modelId}
+                  label={modelLabel || undefined}
+                  onChange={persistModelId}
+                  apiKey={apiKey}
+                />
               </div>
 
               <div className="pt-2">

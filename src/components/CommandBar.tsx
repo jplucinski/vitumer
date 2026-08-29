@@ -15,15 +15,17 @@ interface CommandBarProps {
   setBlocks: React.Dispatch<React.SetStateAction<FlowBlock[]>>;
   apiKey: string | null;
   modelId: string;
+  modelLabel: string;
   promptMode: PromptMode;
   onOpenSettings: () => void;
-  onModelChange: (modelId: string) => void;
+  onModelChange: (modelId: string, label?: string) => void;
 }
 
 const CommandBar: React.FC<CommandBarProps> = ({
   setBlocks,
   apiKey,
   modelId,
+  modelLabel,
   promptMode,
   onOpenSettings,
   onModelChange,
@@ -102,6 +104,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
             setBlocks={setBlocks}
             apiKey={apiKey}
             modelId={modelId}
+            modelLabel={modelLabel}
             promptMode={promptMode}
             onEditInDsl={handleEditInDsl}
             onFeedback={showTransientFeedback}
