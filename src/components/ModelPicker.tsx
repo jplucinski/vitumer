@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Loader2, RefreshCcw } from 'lucide-react';
 import { fetchOpenRouterModels, type ModelSort, type OpenRouterModel } from '../utils/openrouterAuth';
+import { modelPickerDisplay } from '../utils/modelPickerDisplay';
 
 type Props = {
   value: string;
-  onChange: (modelId: string) => void;
+  label?: string;
+  onChange: (modelId: string, label?: string) => void;
   apiKey?: string | null;
   variant?: 'default' | 'compact';
 };
@@ -28,8 +30,9 @@ function formatPrice(pricing?: OpenRouterModel['pricing']): string | null {
   return `$${perM.toFixed(1)}/M`;
 }
 
-export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Props) {
-  const [searchTerm, setSearchTerm] = useState('');
+export function ModelPicker({ value, label, onChange, apiKey, variant = 'default' }: Props) {
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [sort, setSort] = useState<ModelSort>('most-popular');
   const [models, setModels] = useState<OpenRouterModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,6 +43,8 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchIdRef = useRef(0);
+
+  const fetchQuery = isSearching ? query : '';
 
   const loadModels = useCallback(
     async (q: string) => {
@@ -68,38 +73,54 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      void loadModels(searchTerm);
+      void loadModels(fetchQuery);
     }, 300);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [searchTerm, sort, loadModels]);
+  }, [fetchQuery, sort, loadModels]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsSearching(false);
+        setQuery('');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const matchedModel = models.find((model) => model.id === value);
+  const resolvedLabel = label ?? matchedModel?.name;
   const selectedInList = models.some((model) => model.id === value);
-  const showCustomBadge = value && !selectedInList && !searchTerm;
+  const showCustomBadge = value && !selectedInList && !isSearching;
+
+  const inputValue = modelPickerDisplay({
+    isSearching,
+    query,
+    label: resolvedLabel,
+    id: value,
+  });
+
+  const exitSearch = () => {
+    setIsSearching(false);
+    setQuery('');
+  };
 
   const selectModel = (model: OpenRouterModel) => {
-    onChange(model.id);
-    setSearchTerm('');
+    onChange(model.id, model.name);
+    exitSearch();
     setIsOpen(false);
     setHighlightIndex(-1);
   };
 
   const commitCustomValue = () => {
-    const trimmed = searchTerm.trim();
+    const trimmed = query.trim();
     if (trimmed) {
-      onChange(trimmed);
-      setSearchTerm('');
+      onChange(trimmed, trimmed);
+      exitSearch();
       setIsOpen(false);
     }
   };
@@ -127,19 +148,13 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
     }
     if (event.key === 'Escape') {
       setIsOpen(false);
-      setSearchTerm('');
+      exitSearch();
       inputRef.current?.blur();
     }
   };
 
   return (
     <div className="model-picker" ref={containerRef}>
-      {value && (
-        <div className="model-picker-selected text-xs mb-1.5 font-mono opacity-70 truncate">
-          Selected: {value}
-        </div>
-      )}
-
       {variant !== 'compact' && (
         <div className="flex gap-2 mb-2">
           <select
@@ -161,15 +176,21 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
           type="text"
           className="input w-full rounded-lg p-2.5 pr-9"
           placeholder="Search OpenRouter models..."
-          value={searchTerm}
+          value={inputValue}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
+            setQuery(e.target.value);
             setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsSearching(true);
+            setQuery('');
+            setIsOpen(true);
+          }}
           onBlur={() => {
-            if (searchTerm.trim()) {
+            if (isSearching && query.trim()) {
               commitCustomValue();
+            } else {
+              exitSearch();
             }
           }}
           onKeyDown={handleKeyDown}
@@ -197,7 +218,7 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
           <button
             type="button"
             className="flex items-center gap-1 opacity-70 hover:opacity-100"
-            onClick={() => void loadModels(searchTerm)}
+            onClick={() => void loadModels(fetchQuery)}
           >
             <RefreshCcw size={12} />
             Retry
@@ -212,7 +233,7 @@ export function ModelPicker({ value, onChange, apiKey, variant = 'default' }: Pr
           )}
           {!loading && models.length === 0 && (
             <li className="model-picker-item model-picker-item--empty">
-              No models found. Press Enter to use &quot;{searchTerm.trim() || value}&quot; as custom ID.
+              No models found. Press Enter to use &quot;{query.trim() || value}&quot; as custom ID.
             </li>
           )}
           {models.map((model, index) => {

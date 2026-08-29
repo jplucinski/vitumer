@@ -27,11 +27,12 @@ interface AISessionThreadProps {
   setBlocks: React.Dispatch<React.SetStateAction<FlowBlock[]>>;
   apiKey: string | null;
   modelId: string;
+  modelLabel: string;
   promptMode: PromptMode;
   onEditInDsl: (dsl: string) => void;
   onFeedback: (message: string, type?: 'success' | 'error' | 'info') => void;
   onOpenSettings: () => void;
-  onModelChange: (modelId: string) => void;
+  onModelChange: (modelId: string, label?: string) => void;
 }
 
 function UserTurnBubble({
@@ -112,6 +113,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
   setBlocks,
   apiKey,
   modelId,
+  modelLabel,
   promptMode,
   onEditInDsl,
   onFeedback,
@@ -323,6 +325,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
             <div className="space-y-2">
               <ModelPicker
                 value={modelId}
+                label={modelLabel || undefined}
                 onChange={onModelChange}
                 apiKey={apiKey}
                 variant="compact"
@@ -427,6 +430,8 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
 
         {!pendingActions && (
           <p className="text-[10px] opacity-35 font-mono mt-2 px-1">
+            <span className="opacity-80">Model: {modelLabel || modelId}</span>
+            {' · '}
             Enter to send · Shift+Enter for new line
             {!apiKey && ' · Connect OpenRouter in Settings'}
           </p>
