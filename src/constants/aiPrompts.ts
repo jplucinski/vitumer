@@ -19,17 +19,20 @@ export function savePromptMode(mode: PromptMode): void {
   }
 }
 
+const BLOCK_OUTPUT_FIRST = `Return a single JSON object only. No markdown, no code fences, no prose before or after the object.
+Do not emit Vitumer DSL. Expand loops into separate block objects.`;
+
 const BLOCK_ROLE =
   "You are a productivity and time-planning expert. Transform the user's request into a structured schedule of time blocks.";
 
-const BLOCK_OUTPUT_SCHEMA = `Always return a single JSON object with exactly these fields:
+const BLOCK_OUTPUT_SCHEMA = `The JSON object must have exactly these fields:
 - "reasoning": 1-2 sentences in English explaining why you chose this schedule.
 - "blocks": array of time block objects in execution order.
 - "suggestions": array of 3-4 follow-up refinement chips tailored to THIS schedule.
 
 Each block in "blocks" must include:
 - "duration": duration in seconds (positive integer)
-- "label": short lowercase block name (e.g. pomo, break, work, warmup)
+- "label": short lowercase English name (e.g. pomo, break, work, warmup)
 - "color": one of orange, teal, blue, purple, rose, amber
 - "emoji": single emoji matching the task (required on every block)
 
@@ -60,16 +63,6 @@ const BLOCK_SUGGESTION_RULES = `Suggestion rules:
 - Prefer concrete wording in "text" (e.g. "Make breaks 10 minutes" not "Make breaks longer").
 - Always include: {"label": "Regenerate", "text": "Regenerate with a fresh take on the same request"}
 - Never use vague chips like "Add more blocks", "Make it better", "Change colors" without specifics.`;
-
-const BLOCK_DSL_MAP = `JSON-to-DSL mapping (for your reference when choosing fields):
-- duration+label → 25m pomo
-- color → [color:orange]
-- emoji → [emoji:📚]
-- description → {Deep reading}
-- skippable → [skippable]
-- retryable → [retry]
-- hold → [hold]
-Return fully expanded blocks, never loop shorthand like 3 * (...).`;
 
 const BLOCK_EXAMPLES = `Example for "3 study sessions of 25 min with 5 min breaks":
 {
@@ -109,18 +102,39 @@ Example for "HIIT 4 rounds: 40s work and 20s rest":
     {"label": "6 rounds", "text": "Expand to 6 rounds of 40s work and 20s rest"},
     {"label": "Regenerate", "text": "Regenerate with a fresh take on the same request"}
   ]
-}`;
+}
+
+Example for "5 min aeropress, hold after brew before I pour":
+{
+  "reasoning": "Short brew ritual with a hold so the next slot waits for a tap after the pour-ready brew.",
+  "blocks": [
+    {"duration": 60, "label": "prep", "color": "amber", "emoji": "☕", "description": "Rinse filter, heat water"},
+    {"duration": 240, "label": "brew", "color": "orange", "emoji": "☕", "description": "Bloom and press", "hold": true},
+    {"duration": 120, "label": "rest", "color": "teal", "emoji": "💧"}
+  ],
+  "suggestions": [
+    {"label": "Skip hold", "text": "Remove the hold after the brew block"},
+    {"label": "Longer brew", "text": "Change the brew block to 5 minutes"},
+    {"label": "Add cooldown", "text": "Add a 1 minute cooldown sip block at the end"},
+    {"label": "Regenerate", "text": "Regenerate with a fresh take on the same request"}
+  ]
+}
+
+Negative examples — never do these:
+- Do not wrap JSON in markdown fences (no \`\`\`json).
+- Do not put loop shorthand like 3 * (...) inside JSON blocks — expand each cycle into objects.
+- Do not return a DSL string instead of a blocks array.`;
 
 const BLOCK_REFINEMENT_ADDENDUM =
   'The user is refining a previous schedule. Apply their latest request as a delta to the prior blocks unless they ask for a full rewrite. Always return the complete updated blocks array and a fresh "suggestions" array tailored to the new schedule. Preserve emoji and color on unchanged blocks unless the user asks to change them.';
 
 export function buildBlockGenerationPrompt(mode: PromptMode): string {
   const layers = [
+    BLOCK_OUTPUT_FIRST,
     BLOCK_ROLE,
     BLOCK_OUTPUT_SCHEMA,
     BLOCK_FIELD_RULES,
     BLOCK_SUGGESTION_RULES,
-    BLOCK_DSL_MAP,
   ];
   if (mode === 'verbose') {
     layers.push(BLOCK_EXAMPLES);

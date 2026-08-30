@@ -31,7 +31,13 @@ const PromptsPage = ({ onNavigate }: Props) => {
             <FileText size={18} className="opacity-50 shrink-0" />
             <span className="truncate">AI Prompts</span>
           </h1>
-          <p className="text-xs opacity-50 mt-0.5">OpenRouter system prompts used by Vitumer</p>
+          <p className="text-xs opacity-50 mt-0.5">
+            In-app OpenRouter prompts only — not the brief for ChatGPT/Claude. That playbook is{' '}
+            <a href="/llms.txt" className="underline hover:opacity-100">
+              /llms.txt
+            </a>
+            .
+          </p>
           <div className="flex gap-1 mt-3">
             {(['compact', 'verbose'] as const).map((mode) => (
               <button

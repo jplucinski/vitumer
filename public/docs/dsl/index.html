@@ -131,23 +131,30 @@
         <pre>25m work [hold] + 5m rest [color:teal]</pre>
       </div>
 
+      <div class="example">
+        <div class="example-title">Knee mobility</div>
+        <pre>4 * (3m stretch {Knee mobility} [emoji:🦵, color:teal] + 2m rest [emoji:💧, color:teal])</pre>
+      </div>
+
       <h2>Shareable links</h2>
       <p>
-        Encode a DSL string as base64 (UTF-8) and append it to the app URL:
+        Encode a DSL string as UTF-8 base64 (same as <code>btoa(unescape(encodeURIComponent(dsl)))</code>) and append it:
       </p>
-      <pre>https://{your-origin}/?flow={base64-dsl}</pre>
+      <pre>https://vitumer.jplucinski.dev/?flow={base64}</pre>
       <p>Example DSL:</p>
       <pre>3 * (25m pomo [color:orange] + 5m break [color:teal])</pre>
       <p>Example base64:</p>
       <pre>MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=</pre>
-      <p>Example link (replace origin with your deployment):</p>
-      <pre>https://{your-origin}/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=</pre>
+      <p>Example link:</p>
+      <pre>https://vitumer.jplucinski.dev/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=</pre>
 
       <h2>For AI assistants</h2>
       <p>
-        When creating a session for a user, return the DSL, a share link (if origin is known), and a short schedule explanation.
-        Put block attributes on each block, not after a loop.
-        See also <a href="/llms.txt">/llms.txt</a> for machine-readable docs.
+        If a user asks you to create a session on https://vitumer.jplucinski.dev/, return:
+        a short English explanation, valid DSL (English labels, attributes on each block),
+        and one ready <code>?flow=</code> link on that origin.
+        Focus/work → orange, rest/break → teal, emoji on every block.
+        See <a href="/llms.txt">/llms.txt</a> for the full playbook.
       </p>
     </main>
   </body>
