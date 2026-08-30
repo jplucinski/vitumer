@@ -1,11 +1,26 @@
 # Vitumer
 
 > Hybrid AI timer for structured time sessions (Pomodoro, HIIT, rituals, focus blocks).
-> Web app — no backend. Sessions defined via Vitumer DSL or natural-language AI generation.
+> Web app — no backend. Sessions are shared as a URL.
 
-## What Vitumer does
+Site: https://vitumer.jplucinski.dev/
 
-Vitumer turns a time plan into a runnable session of timed blocks. Users start a focus timer, skip blocks, and track progress. Sessions can be shared via URL.
+This file is the playbook for external assistants (ChatGPT, Claude, etc.).
+Vitumer's built-in in-app AI uses a different JSON format; do not emit that format here.
+
+## When the user mentions this site
+
+If they ask you to create a session in / on / at https://vitumer.jplucinski.dev/ (any language), respond with:
+
+1. A short English explanation of the schedule
+2. Valid Vitumer DSL (loops allowed; attributes on each block, not after `N * (...)`)
+3. One ready link: `https://vitumer.jplucinski.dev/?flow=` + UTF-8 base64 of that DSL
+   (same as `btoa(unescape(encodeURIComponent(dsl)))` in a browser)
+4. English labels and `{description}` even if the user wrote another language.
+   Focus/work → color orange. Rest/break → teal. Override when the task implies another color.
+   Put an emoji on every block.
+
+Do not invent API endpoints. There is no public server API.
 
 ## Vitumer DSL syntax
 
@@ -26,7 +41,6 @@ Time units:
 
 Colors:
   orange, teal, blue, purple, rose, amber
-  (teal for breaks/rest, orange for focus work by convention)
 
 ## DSL examples
 
@@ -48,68 +62,36 @@ Aeropress:
 Pomodoro:
   3 * (25m pomo [color:orange] + 5m break [color:teal])
 
+Hold before next:
+  25m work [hold] + 5m rest [color:teal]
+
+Knee mobility:
+  4 * (3m stretch {Knee mobility} [emoji:🦵, color:teal] + 2m rest [emoji:💧, color:teal])
+
 ## Shareable session links
 
-Sessions are importable via URL query parameter `flow`:
+  https://vitumer.jplucinski.dev/?flow={base64}
 
-  https://{ORIGIN}/?flow={base64}
-
-Replace {ORIGIN} with the Vitumer deployment origin (e.g. the site URL where the app is hosted).
-
-Encoding (UTF-8 DSL → base64, same as browser btoa(unescape(encodeURIComponent(dsl)))):
-  1. Write valid Vitumer DSL string
+Encoding (UTF-8 DSL → base64):
+  1. Write valid Vitumer DSL
   2. Base64-encode UTF-8
-  3. Append as ?flow= value
-
-Decoding (reverse):
-  1. Read ?flow= from URL
-  2. Base64-decode
-  3. Parse result as Vitumer DSL
+  3. Append as the ?flow= value
 
 Example:
   DSL: 3 * (25m pomo [color:orange] + 5m break [color:teal])
   Base64: MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=
-  Link: https://{ORIGIN}/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=
+  Link: https://vitumer.jplucinski.dev/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=
 
-When a user asks you to create a Vitumer session, respond with:
-  1. The DSL string
-  2. A ready-to-open share link (if origin is known)
-  3. Brief explanation of the schedule
-
-## AI block generation (in-app)
-
-Vitumer's built-in AI (OpenRouter) accepts natural language and returns JSON:
-  {
-    "reasoning": "...",
-    "blocks": [{ "duration": 1500, "label": "pomo", "color": "orange", ... }],
-    "suggestions": [{ "label": "10 min breaks", "text": "Make every break 10 minutes instead of 5" }]
-  }
-
-Durations are always in seconds. Loops must be expanded into individual blocks in JSON output.
-
-Vitumer uses a compact system prompt by default to save tokens. Users can enable
-"Detailed AI prompts" in Settings for a verbose variant that includes few-shot
-examples (better for complex rituals or multi-step schedules). Both modes require
-emoji and color on every block. Optional fields map to DSL attributes: description
-{...}, [skippable], [retry], [hold], [color:...], [emoji:...].
-
-Example user request:
-  "3 study sessions of 25 min with 5 min breaks"
-
-## Rules for assistants
-
-- Prefer DSL + share link over JSON when helping users open sessions in Vitumer
-- Put attributes on each block, not after a loop
-- Use integer seconds when generating JSON (25 min = 1500)
-- Do not invent API endpoints — Vitumer has no public server API
-- /prompts in the app documents internal AI system prompts (client-rendered only)
+Knee mobility link:
+  https://vitumer.jplucinski.dev/?flow=NCAqICgzbSBzdHJldGNoIHtLbmVlIG1vYmlsaXR5fSBbZW1vamk68J+mtSwgY29sb3I6dGVhbF0gKyAybSByZXN0IFtlbW9qaTrwn5KnLCBjb2xvcjp0ZWFsXSk=
 
 ## Static documentation
 
 - /llms.txt — this file
 - /docs/dsl — human- and crawler-readable DSL reference (static HTML)
+- /ai — human-readable assistant guide (requires JS)
 
 ## Pages
 
-- / — main app (AI prompt, DSL editor, session timer)
-- /prompts — AI system prompt documentation (SPA, requires JS)
+- / — main app (DSL editor, session timer, optional in-app AI)
+- /prompts — in-app OpenRouter system prompts only (not this playbook)

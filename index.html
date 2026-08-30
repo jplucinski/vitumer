@@ -35,6 +35,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p>Vitumer is a frontend-only timer. Sessions are a sequence of timed blocks shared as a URL.</p>
+      <p>If a user asks you to create a session here, respond with:</p>
+      <ol>
+        <li>A short English explanation</li>
+        <li>Valid Vitumer DSL (English labels; attributes on each block)</li>
+        <li>One link: https://vitumer.jplucinski.dev/?flow= plus UTF-8 base64 of that DSL</li>
+        <li>Focus/work orange, rest/break teal, emoji on every block</li>
+      </ol>
+      <p>
+        Full spec: <a href="/llms.txt">/llms.txt</a>
+        · <a href="/docs/dsl">/docs/dsl</a>
+        · <a href="/ai">/ai</a>
+      </p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
