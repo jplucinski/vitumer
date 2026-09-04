@@ -13,7 +13,14 @@ export const STORAGE_KEYS = {
   aiCachePrefix: storageKey('ai_cache_'),
   aiPromptMode: storageKey('ai_prompt_mode'),
   openrouterPasskeyVault: storageKey('openrouter_passkey_vault'),
+  openrouterModelId: storageKey('openrouter_model_id'),
+  openrouterModelLabel: storageKey('openrouter_model_label'),
 } as const;
+
+const LEGACY_OPENROUTER_KEYS = [
+  { oldKey: 'openrouter_model_id', newKey: STORAGE_KEYS.openrouterModelId },
+  { oldKey: 'openrouter_model_label', newKey: STORAGE_KEYS.openrouterModelLabel },
+] as const;
 
 export function migrateLegacyStorageKeys() {
   const suffixes = [
@@ -46,6 +53,14 @@ export function migrateLegacyStorageKeys() {
     const newKey = oldKey.replace(OLD_PREFIX, STORAGE_PREFIX);
     if (localStorage.getItem(newKey) === null) {
       localStorage.setItem(newKey, localStorage.getItem(oldKey)!);
+    }
+    localStorage.removeItem(oldKey);
+  }
+
+  for (const { oldKey, newKey } of LEGACY_OPENROUTER_KEYS) {
+    const value = localStorage.getItem(oldKey);
+    if (value !== null && localStorage.getItem(newKey) === null) {
+      localStorage.setItem(newKey, value);
     }
     localStorage.removeItem(oldKey);
   }

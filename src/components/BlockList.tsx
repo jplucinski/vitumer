@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
 import { GripVertical, Clock, X, Edit3, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 import { BLOCK_COLORS, BLOCK_EMOJIS, COLOR_SWATCH, getColorDotClass } from '../constants/blockOptions';
+import type { FlowBlock } from '../utils/dslParser';
 
 const DURATION_PRESETS = [
   { label: '30s', seconds: 30 },
@@ -9,9 +10,26 @@ const DURATION_PRESETS = [
   { label: '5m', seconds: 300 },
   { label: '10m', seconds: 600 },
   { label: '25m', seconds: 1500 },
-];
+] as const;
 
-function formatDuration(seconds) {
+type BlockDraft = {
+  id: string;
+  label: string;
+  duration: number;
+  description: string;
+  emoji: string;
+  color: string;
+  skippable: boolean;
+  retryable: boolean;
+  hold: boolean;
+};
+
+type BlockListProps = {
+  blocks: FlowBlock[];
+  setBlocks: Dispatch<SetStateAction<FlowBlock[]>>;
+};
+
+function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   if (m === 0) return `${s}s`;
@@ -19,7 +37,14 @@ function formatDuration(seconds) {
   return `${m}m ${s}s`;
 }
 
-function FlagToggle({ checked, onChange, label, hint }) {
+type FlagToggleProps = {
+  checked: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  label: string;
+  hint?: string;
+};
+
+function FlagToggle({ checked, onChange, label, hint }: FlagToggleProps) {
   return (
     <label className="flex items-center justify-between gap-3 rounded-2xl border border-(--border-color) bg-(--block-color)/50 px-3 py-3 cursor-pointer">
       <span className="text-xs min-w-0">
@@ -51,19 +76,21 @@ function FlagToggle({ checked, onChange, label, hint }) {
   );
 }
 
-const BlockList = ({ blocks, setBlocks }) => {
-  const [selectedBlock, setSelectedBlock] = useState(null);
-  const [draft, setDraft] = useState({
-    id: '',
-    label: '',
-    duration: 1500,
-    description: '',
-    emoji: '',
-    color: 'orange',
-    skippable: false,
-    retryable: false,
-    hold: false,
-  });
+const emptyDraft = (): BlockDraft => ({
+  id: '',
+  label: '',
+  duration: 1500,
+  description: '',
+  emoji: '',
+  color: 'orange',
+  skippable: false,
+  retryable: false,
+  hold: false,
+});
+
+const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
+  const [selectedBlock, setSelectedBlock] = useState<FlowBlock | null>(null);
+  const [draft, setDraft] = useState<BlockDraft>(emptyDraft);
 
   useEffect(() => {
     if (selectedBlock) {
@@ -82,7 +109,7 @@ const BlockList = ({ blocks, setBlocks }) => {
   }, [selectedBlock]);
 
   const addBlock = () => {
-    const newBlock = {
+    const newBlock: FlowBlock = {
       id: Math.random().toString(36).substring(2, 11),
       duration: 25 * 60,
       label: 'new task',
