@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import clsx from 'clsx';
 import { AI_PROMPT_DOCS, type PromptMode } from '../constants/aiPrompts';
+import { AppNav } from './AppNav';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useSectionReveal } from '../hooks/useGsapMotion';
 
 type Props = {
   onNavigate: (path: string) => void;
@@ -10,57 +13,64 @@ type Props = {
 const PromptsPage = ({ onNavigate }: Props) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [previewMode, setPreviewMode] = useState<PromptMode>('compact');
+  const reduced = useReducedMotion();
+  const revealRef = useSectionReveal(reduced);
 
   const toggle = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const marqueeTitles = [...AI_PROMPT_DOCS.map((doc) => doc.title), ...AI_PROMPT_DOCS.map((doc) => doc.title)];
+
   return (
-    <div className="min-h-screen app-container transition-colors duration-300">
-      <header className="max-w-3xl mx-auto w-full p-4 sm:p-6 flex items-center gap-4">
-        <button
-          onClick={() => onNavigate('/')}
-          className="inline-flex items-center justify-center min-h-11 min-w-11 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors opacity-60 hover:opacity-100 shrink-0"
-          title="Back to app"
-          type="button"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div className="min-w-0">
-          <h1 className="font-mono text-lg sm:text-xl font-semibold flex items-center gap-2">
-            <FileText size={18} className="opacity-50 shrink-0" />
-            <span className="truncate">AI Prompts</span>
-          </h1>
-          <p className="text-xs opacity-50 mt-0.5">
-            In-app OpenRouter prompts only — not the brief for ChatGPT/Claude. That playbook is{' '}
+    <div className="min-h-screen app-container overflow-x-hidden transition-colors duration-300">
+      <AppNav variant="subpage" onBack={() => onNavigate('/')} />
+
+      <div className="marquee-mask border-y border-(--border-color)/40 py-4">
+        <div className="marquee-track text-sm font-medium opacity-60">
+          {marqueeTitles.map((title, index) => (
+            <span key={`${title}-${index}`} className="whitespace-nowrap">
+              {title}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <main ref={revealRef} className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 pb-24 sm:px-6">
+        <header className="py-8" data-reveal>
+          <h2 className="text-lg font-semibold">In-app prompts</h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed opacity-70">
+            These are the OpenRouter prompts Vitumer sends from the browser. The paste-out playbook for other models lives at{' '}
             <a href="/llms.txt" className="underline hover:opacity-100">
               /llms.txt
             </a>
             .
           </p>
-          <div className="flex gap-1 mt-3">
+          <div className="mt-6 flex gap-2">
             {(['compact', 'verbose'] as const).map((mode) => (
               <button
                 key={mode}
                 type="button"
                 onClick={() => setPreviewMode(mode)}
                 className={clsx(
-                  'px-3 py-1 rounded-lg text-xs font-mono capitalize transition-colors',
-                  previewMode === mode ? 'bg-white/10 opacity-100' : 'opacity-40 hover:opacity-70'
+                  'rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors',
+                  previewMode === mode
+                    ? 'btn-primary-solid'
+                    : 'border border-(--border-color) opacity-60 hover:opacity-100'
                 )}
               >
                 {mode}
               </button>
             ))}
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-3xl mx-auto w-full px-4 sm:px-6 pb-20 space-y-6">
+        <div className="space-y-6">
         {AI_PROMPT_DOCS.map((doc) => (
           <article
             key={doc.id}
-            className="rounded-2xl border border-(--border-color) bg-(--block-color) p-5 sm:p-6 space-y-4"
+            data-reveal
+            className="space-y-4 rounded-3xl border border-(--border-color) bg-(--block-color) p-5 sm:p-6"
           >
             <div>
               <h2 className="font-mono text-base font-semibold inline-flex items-center flex-wrap gap-x-2">
@@ -137,8 +147,9 @@ const PromptsPage = ({ onNavigate }: Props) => {
             </div>
           </article>
         ))}
+        </div>
 
-        <p className="text-[11px] opacity-50 font-mono leading-relaxed text-center px-4">
+        <p className="mt-10 px-4 text-center text-sm leading-relaxed opacity-50">
           Vitumer runs entirely in your browser. API keys are stored locally and requests go directly to OpenRouter —
           no intermediary server.
         </p>

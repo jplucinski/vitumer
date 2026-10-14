@@ -50,8 +50,8 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
         <div className="space-y-3 min-w-0">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]" />
-            <div className="text-xs font-mono uppercase tracking-[0.24em] text-blue-300/80">
-              {showResume ? 'Resume focus' : 'Ready to focus'}
+            <div className="text-sm font-medium text-blue-300/90">
+              {showResume ? 'Pick up where you left off' : 'Ready when you are'}
             </div>
           </div>
 

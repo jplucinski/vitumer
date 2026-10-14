@@ -1,5 +1,5 @@
 // src/components/CommandBar.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import { CornerDownLeft } from 'lucide-react';
 import { parseDSL, FlowBlock } from '../utils/dslParser';
@@ -19,6 +19,8 @@ interface CommandBarProps {
   promptMode: PromptMode;
   onOpenSettings: () => void;
   onModelChange: (modelId: string, label?: string) => void;
+  aiFocusToken?: number;
+  dslFocusToken?: number;
 }
 
 const CommandBar: React.FC<CommandBarProps> = ({
@@ -29,6 +31,8 @@ const CommandBar: React.FC<CommandBarProps> = ({
   promptMode,
   onOpenSettings,
   onModelChange,
+  aiFocusToken = 0,
+  dslFocusToken = 0,
 }) => {
   const [activeTab, setActiveTab] = useState<'ai' | 'dsl'>('ai');
   const [dslInput, setDslInput] = useState('');
@@ -45,6 +49,14 @@ const CommandBar: React.FC<CommandBarProps> = ({
     }
     feedbackTimer.current = window.setTimeout(() => setFeedbackMessage(''), 3200);
   };
+
+  useEffect(() => {
+    if (aiFocusToken > 0) setActiveTab('ai');
+  }, [aiFocusToken]);
+
+  useEffect(() => {
+    if (dslFocusToken > 0) setActiveTab('dsl');
+  }, [dslFocusToken]);
 
   const handleEditInDsl = (dsl: string) => {
     setActiveTab('dsl');
@@ -71,7 +83,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
 
   return (
     <div className="command-workspace space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:max-h-[calc(100dvh-2rem)] lg:overflow-hidden lg:flex lg:flex-col">
-      <section className="rounded-3xl border border-(--border-color) bg-(--block-color) overflow-hidden shadow-sm lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
+      <section className="surface-card overflow-hidden rounded-3xl border border-(--border-color) bg-(--block-color) shadow-sm lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
         <div className="flex items-center gap-1 p-2 border-b border-(--border-color) bg-black/[0.02] dark:bg-white/[0.02]">
           <button
             className={clsx(

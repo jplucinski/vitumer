@@ -1,7 +1,7 @@
 import FocusView from './components/FocusView';
 import PromptsPage from './components/PromptsPage';
 import AIAgentsPage from './components/AIAgentsPage';
-import { AppHeader } from './components/AppHeader';
+import { AppNav } from './components/AppNav';
 import { HomeView } from './components/HomeView';
 import { SettingsModal } from './components/SettingsModal';
 import { ConsentModal } from './components/ConsentModal';
@@ -80,7 +80,8 @@ function App() {
         isFocusMode ? ' is-focus-mode' : ''
       }`}
     >
-      <AppHeader
+      <AppNav
+        variant="app"
         connectionStatus={auth.connectionStatus}
         isDark={ui.isDark}
         onNavigatePrompts={() => navigate('/prompts')}
@@ -89,7 +90,7 @@ function App() {
       />
 
       <main
-        className={`app-main max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 grow ${
+        className={`app-main mx-auto w-full max-w-full grow overflow-x-hidden px-4 sm:px-6 lg:px-8 ${
           isDesktop ? 'pb-10' : 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]'
         }`}
       >
@@ -177,20 +178,20 @@ function App() {
       )}
 
       {!isFocusMode && (
-        <footer className="max-w-4xl lg:max-w-none mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 mt-8 border-t border-(--border-color)/30">
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs opacity-50 hover:opacity-70 transition-opacity">
-            <a
-              href="/llms.txt"
-              className="font-mono hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              For AI agents / LLMs
-            </a>
-            <span className="opacity-30">•</span>
-            <button onClick={() => navigate('/ai')} className="font-mono hover:underline" type="button">
-              AI Integration Docs
-            </button>
+        <footer className="mx-auto mt-8 w-full max-w-6xl border-t border-(--border-color)/30 px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs opacity-50 transition-opacity hover:opacity-70">
+              <a
+                href="/llms.txt"
+                className="font-mono hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                For AI agents / LLMs
+              </a>
+              <span className="opacity-30">•</span>
+              <button onClick={() => navigate('/ai')} className="font-mono hover:underline" type="button">
+                AI Integration Docs
+              </button>
           </div>
         </footer>
       )}

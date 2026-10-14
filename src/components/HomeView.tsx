@@ -48,8 +48,8 @@ export function HomeView({
   onModelChange,
 }: HomeViewProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-8 lg:items-start space-y-5 sm:space-y-8 mt-4 sm:mt-6 lg:space-y-0 max-w-2xl mx-auto lg:max-w-none">
-      <div className="order-2 lg:order-none lg:col-start-1 flex flex-col space-y-5 sm:space-y-8 min-w-0">
+    <div className="mt-2 grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
+      <div className="flex min-w-0 flex-col gap-6 lg:col-span-5">
         {isDesktop && (
           <SessionLaunchCard
             blocks={blocks}
@@ -59,50 +59,46 @@ export function HomeView({
           />
         )}
 
-        <div className="relative group">
-          {apiKey ? (
-            <AIFeedback
-              message={aiAdvice}
-              type="suggestion"
-              onRefresh={onRefreshAdvice}
-              isLoading={isLoadingAdvice}
-            />
-          ) : (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-(--border-color) bg-(--block-color)">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 text-zinc-500">
-                  <Sparkles size={16} />
-                </div>
-                <div className="text-sm opacity-70 leading-relaxed">
-                  Connect <strong>OpenRouter</strong> to get personalized AI advice and unlock the full assistant.
-                </div>
+        {apiKey ? (
+          <AIFeedback
+            message={aiAdvice}
+            type="suggestion"
+            onRefresh={onRefreshAdvice}
+            isLoading={isLoadingAdvice}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-between gap-4 rounded-3xl border border-(--border-color) bg-(--block-color) p-5 sm:flex-row">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-zinc-500">
+                <Sparkles size={16} />
               </div>
-              <button onClick={onStartConnect} className="btn primary py-1.5 px-4 text-xs shrink-0" type="button">
-                Connect OpenRouter
-              </button>
+              <div className="text-sm leading-relaxed opacity-70">
+                Connect <strong>OpenRouter</strong> to get personalized AI advice and unlock the full assistant.
+              </div>
             </div>
-          )}
-        </div>
+            <button onClick={onStartConnect} className="btn primary shrink-0 px-4 py-1.5 text-xs" type="button">
+              Connect OpenRouter
+            </button>
+          </div>
+        )}
 
-        <div className="mt-4 sm:mt-6">
-          <div className="flex justify-between items-end mb-4 px-2">
-            <h2 className="text-xs font-mono uppercase tracking-widest opacity-50">Session Structure</h2>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={onShareQr}
-                className="flex items-center gap-1.5 min-h-11 px-2 text-xs font-mono uppercase tracking-wider opacity-40 hover:opacity-100 transition-opacity"
-                type="button"
-              >
-                <QrCode size={12} />
-                Share as QR
-              </button>
-            </div>
+        <div>
+          <div className="mb-4 flex items-end justify-between px-1">
+            <h2 className="text-sm font-medium">This session</h2>
+            <button
+              onClick={onShareQr}
+              className="flex min-h-11 items-center gap-1.5 px-2 text-xs font-medium opacity-60 transition-opacity hover:opacity-100"
+              type="button"
+            >
+              <QrCode size={14} />
+              Share as QR
+            </button>
           </div>
           <BlockList blocks={blocks} setBlocks={setBlocks} />
         </div>
       </div>
 
-      <div className="order-1 lg:order-none lg:col-start-2 min-w-0">
+      <div className="min-w-0 lg:col-span-7">
         <CommandBar
           setBlocks={setBlocks}
           apiKey={apiKey}

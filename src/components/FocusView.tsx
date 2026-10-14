@@ -7,6 +7,9 @@ import { getColorBadgeClasses, getColorBorderClass, getColorPulseClass } from '.
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import { FOCUS_IMMERSIVE_QUERY } from '../constants/breakpoints';
 import { resolveTimerZeroAction, restoreTimerProgress, type RestoredTimer, type TimerProgress } from '../utils/timerProgress';
+import { gsap, useGSAP } from '../utils/gsap';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useScreenWakeLock } from '../hooks/useScreenWakeLock';
 
 const REST_LABELS = ['break', 'rest', 'przerwa', 'przerwa-kawa'];
 
@@ -59,6 +62,19 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const persistEnabledRef = useRef(true);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+  const holdWakeLock = useScreenWakeLock(!isPaused || awaitingNext);
+
+  useGSAP(() => {
+    if (reducedMotion || !stageRef.current) return;
+    gsap.from(stageRef.current, {
+      opacity: 0,
+      scale: 0.96,
+      duration: 0.65,
+      ease: 'power2.out',
+    });
+  }, { dependencies: [reducedMotion] });
 
   const playChime = () => {
     if (!soundEnabled) return;
@@ -245,11 +261,13 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     const handleKeyDown = (e: KeyboardEvent) => {
       if (awaitingNext && (e.code === 'Space' || e.key === 'Enter')) {
         e.preventDefault();
+        void holdWakeLock();
         handleBlockCompleted();
         return;
       }
       if (e.code === 'Space') {
         e.preventDefault();
+        if (isPaused) void holdWakeLock();
         setIsPaused(p => !p);
       } else if (e.key === 'ArrowRight' && canSkip) {
         handleNext();
@@ -264,7 +282,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- handlers close over latest index/flags
-  }, [currentBlockIndex, activeBlock, blocks.length, awaitingNext, canSkip, canRetry]);
+  }, [currentBlockIndex, activeBlock, blocks.length, awaitingNext, canSkip, canRetry, isPaused, holdWakeLock]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -366,11 +384,20 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
     <div className="focus-split mt-4 sm:mt-8 px-0 animate-in fade-in zoom-in-95 duration-300">
       <div className="focus-split-main">
         <div
-          className="focus-split-stage flex-1 flex flex-col items-center justify-center text-center gap-6 w-full min-w-0 py-4"
+          ref={stageRef}
+          className="focus-split-stage relative flex-1 flex flex-col items-center justify-center text-center gap-6 w-full min-w-0 py-4"
           onClick={() => {
             if (awaitingNext) handleBlockCompleted();
           }}
         >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 40%, var(--accent-glow), transparent 42%), radial-gradient(circle at 80% 80%, var(--accent-glow-secondary), transparent 46%)',
+            }}
+          />
           <div className="focus-split-mobile-chips flex-wrap items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-60 max-w-full px-2">
             <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
               {completedCount}/{blocks.length} done
@@ -452,9 +479,11 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             <button
               onClick={() => {
                 if (awaitingNext) {
+                  void holdWakeLock();
                   handleBlockCompleted();
                   return;
                 }
+                if (isPaused) void holdWakeLock();
                 setIsPaused(p => !p);
               }}
               type="button"
