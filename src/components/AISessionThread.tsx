@@ -249,7 +249,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
         {!hasConversation ? (
           <div className="ai-session-empty">
             <p className="text-sm opacity-60 text-center max-w-sm leading-relaxed">
-              Tell the AI what you want to work on — it returns blocks you can accept or tweak.
+              Tell the AI what you want to work on. It returns blocks you can accept or tweak.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               {STARTER_PROMPTS.map((prompt) => (
@@ -429,11 +429,9 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
         </div>
 
         {!pendingActions && (
-          <p className="text-[10px] opacity-35 font-mono mt-2 px-1">
-            <span className="opacity-80">Model: {modelLabel || modelId}</span>
-            {' · '}
-            Enter to send · Shift+Enter for new line
-            {!apiKey && ' · Connect OpenRouter in Settings'}
+          <p className="mt-2 px-1 font-mono text-[11px] leading-relaxed text-(--muted-text)">
+            Model: {(modelLabel || modelId).trim()}. Enter to send. Shift+Enter for a new line.
+            {!apiKey && ' Connect OpenRouter in Settings.'}
           </p>
         )}
       </div>

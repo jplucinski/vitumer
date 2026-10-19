@@ -59,10 +59,10 @@ export function AISuggestionPreview({
 
       {blocks.length > 0 && (
         <div className="mt-3 space-y-2">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.24em] opacity-50">
-            AI Suggestion
-            {status === 'accepted' && ' — Accepted'}
-            {status === 'rejected' && ' — Rejected'}
+          <div className="text-xs font-medium text-(--muted-text)">
+            Suggestion
+            {status === 'accepted' && ' (accepted)'}
+            {status === 'rejected' && ' (rejected)'}
           </div>
           <div className="grid gap-2">
             {blocks.map((block) => (

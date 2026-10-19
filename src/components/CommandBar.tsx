@@ -87,10 +87,10 @@ const CommandBar: React.FC<CommandBarProps> = ({
         <div className="flex items-center gap-1 p-2 border-b border-(--border-color) bg-black/[0.02] dark:bg-white/[0.02]">
           <button
             className={clsx(
-              'px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all',
+              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
               activeTab === 'ai'
-                ? 'bg-white text-black dark:bg-white dark:text-black shadow-sm'
-                : 'opacity-55 hover:opacity-100'
+                ? 'tab-active'
+                : 'text-(--muted-text) hover:text-(--text-color)'
             )}
             onClick={() => setActiveTab('ai')}
             type="button"
@@ -99,10 +99,10 @@ const CommandBar: React.FC<CommandBarProps> = ({
           </button>
           <button
             className={clsx(
-              'px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all',
+              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
               activeTab === 'dsl'
-                ? 'bg-white text-black dark:bg-white dark:text-black shadow-sm'
-                : 'opacity-55 hover:opacity-100'
+                ? 'tab-active'
+                : 'text-(--muted-text) hover:text-(--text-color)'
             )}
             onClick={() => setActiveTab('dsl')}
             type="button"
@@ -135,7 +135,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
               />
               <button
                 onClick={handleDSLSubmit}
-                className="absolute right-3 bottom-3 rounded-full bg-white text-black p-2.5 shadow-md hover:scale-105 transition-transform"
+                className="absolute right-3 bottom-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-(--text-color) text-(--bg-color) transition-transform hover:scale-105"
                 type="button"
               >
                 <CornerDownLeft size={15} />
@@ -143,13 +143,13 @@ const CommandBar: React.FC<CommandBarProps> = ({
             </div>
 
             {dslError && (
-              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs text-red-200 font-mono">
+              <div className="rounded-xl border border-rose-600/20 bg-rose-500/10 px-3 py-2.5 font-mono text-xs text-rose-800 dark:text-rose-200">
                 {dslError}
               </div>
             )}
 
             <div className="rounded-2xl border border-(--border-color) bg-(--bg-color)/40 p-4 text-sm font-mono space-y-3">
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] opacity-50">
+              <div className="flex items-center justify-between text-xs text-(--muted-text)">
                 <span>DSL Reference Guide</span>
                 <span>Syntax</span>
               </div>
@@ -175,9 +175,9 @@ const CommandBar: React.FC<CommandBarProps> = ({
         <div
           className={clsx(
             'px-4 py-2.5 text-sm font-medium rounded-xl',
-            feedbackType === 'success' && 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/10',
-            feedbackType === 'error' && 'bg-rose-500/10 text-rose-200 border border-rose-400/10',
-            feedbackType === 'info' && 'bg-slate-800/70 text-slate-100 border border-slate-700/50'
+            feedbackType === 'success' && 'border border-emerald-600/20 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200',
+            feedbackType === 'error' && 'border border-rose-600/20 bg-rose-500/10 text-rose-800 dark:text-rose-200',
+            feedbackType === 'info' && 'border border-(--border-color) bg-(--block-color) text-(--text-color)'
           )}
         >
           {feedbackMessage}

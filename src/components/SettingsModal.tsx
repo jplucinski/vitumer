@@ -74,7 +74,7 @@ export function SettingsModal({
                 <span className="badge badge-danger">Not connected</span>
               )}
               {connectionStatus === 'connected-passkey' && (
-                <span className="badge badge-success">Unlocked — passkey vault</span>
+                <span className="badge badge-success">Unlocked, passkey vault</span>
               )}
               {connectionStatus === 'connected-session' && (
                 <span className="badge badge-warning">Session only</span>
@@ -170,7 +170,7 @@ export function SettingsModal({
           </button>
 
           <p className="text-[10px] sm:text-[11px] opacity-60 leading-relaxed break-words mt-2">
-            <strong>Warning:</strong> Frontend-only app. Keys never hit our servers — only OpenRouter.
+            <strong>Warning:</strong> Frontend-only app. Keys never hit our servers. They go only to OpenRouter.
             Passkey vault encrypts the key at rest in this browser; after unlock it lives in session
             memory and is visible to scripts on this origin (XSS).
           </p>
@@ -179,14 +179,14 @@ export function SettingsModal({
         <div className="modal-panel-footer">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg opacity-70 hover:opacity-100 hover:bg-(--block-color) transition-all text-xs"
+            className="rounded-lg px-4 py-2 text-xs text-(--text-color) transition-colors hover:bg-(--block-color)"
             type="button"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="px-4 py-2 rounded-lg bg-white text-black font-semibold hover:scale-[1.02] transition-transform text-xs"
+            className="btn btn-primary-solid px-4 py-2 text-xs font-semibold"
             type="button"
           >
             Save Settings
