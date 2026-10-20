@@ -22,11 +22,17 @@ const PromptsPage = ({ onNavigate }: Props) => {
 
   return (
     <div className="min-h-screen app-container overflow-x-hidden transition-colors duration-300">
-      <AppNav variant="subpage" onBack={() => onNavigate('/')} />
+      <AppNav
+        variant="subpage"
+        current="prompts"
+        onBack={() => onNavigate('/')}
+        onNavigateHome={() => onNavigate('/')}
+        onNavigatePrompts={() => onNavigate('/prompts')}
+      />
 
-      <main ref={revealRef} className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 pb-24 sm:px-6">
-        <header className="py-8" data-reveal>
-          <h2 className="text-lg font-semibold">In-app prompts</h2>
+      <main ref={revealRef} className="app-canvas overflow-x-hidden px-4 pb-24 pt-6 sm:px-6 lg:px-8">
+        <header className="pb-8" data-reveal>
+          <h1 className="screen-title">Prompts</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed opacity-70">
             These are the OpenRouter prompts Vitumer sends from the browser. The paste-out playbook for other models lives at{' '}
             <a href="/llms.txt" className="underline hover:opacity-100">
@@ -41,10 +47,10 @@ const PromptsPage = ({ onNavigate }: Props) => {
                 type="button"
                 onClick={() => setPreviewMode(mode)}
                 className={clsx(
-                  'rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors',
+                  'px-1 py-2 text-sm capitalize',
                   previewMode === mode
-                    ? 'btn-primary-solid'
-                    : 'border border-(--border-color) opacity-60 hover:opacity-100'
+                    ? 'tab-active'
+                    : 'text-(--muted-text) hover:text-(--text-color)'
                 )}
               >
                 {mode}
@@ -64,11 +70,11 @@ const PromptsPage = ({ onNavigate }: Props) => {
               <h2 className="font-mono text-base font-semibold inline-flex items-center flex-wrap gap-x-2">
                 {doc.title}
                 {doc.promptModes ? (
-                  <span className="text-[10px] font-mono uppercase tracking-wider opacity-40">
+                  <span className="text-xs text-(--muted-text)">
                     {doc.promptModes.includes(previewMode) ? previewMode : 'single variant'}
                   </span>
                 ) : (
-                  <span className="text-[10px] font-mono uppercase tracking-wider opacity-40">
+                  <span className="text-xs text-(--muted-text)">
                     single variant
                   </span>
                 )}
@@ -83,24 +89,24 @@ const PromptsPage = ({ onNavigate }: Props) => {
 
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
               <div>
-                <dt className="opacity-40 uppercase tracking-wider mb-0.5">Model</dt>
+                <dt className="mb-0.5 text-xs text-(--muted-text)">Model</dt>
                 <dd className="opacity-80">{doc.modelSetting}</dd>
               </div>
               <div>
-                <dt className="opacity-40 uppercase tracking-wider mb-0.5">Response format</dt>
+                <dt className="mb-0.5 text-xs text-(--muted-text)">Response format</dt>
                 <dd className="opacity-80">{doc.responseFormat}</dd>
               </div>
             </dl>
 
             <div>
-              <dt className="text-xs opacity-40 uppercase tracking-wider mb-1 font-mono">User message template</dt>
+              <dt className="mb-1 text-xs text-(--muted-text)">User message template</dt>
               <pre className="text-xs font-mono bg-[var(--bg-color)] border border-(--border-color) rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words">
                 {doc.userTemplate}
               </pre>
             </div>
 
             <div>
-              <dt className="text-xs opacity-40 uppercase tracking-wider mb-1 font-mono">Example user message</dt>
+              <dt className="mb-1 text-xs text-(--muted-text)">Example user message</dt>
               <pre className="text-xs font-mono bg-[var(--bg-color)] border border-(--border-color) rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words">
                 {doc.exampleUser}
               </pre>
@@ -108,7 +114,7 @@ const PromptsPage = ({ onNavigate }: Props) => {
 
             {doc.exampleResponse ? (
               <div>
-                <dt className="text-xs opacity-40 uppercase tracking-wider mb-1 font-mono">Example response</dt>
+                <dt className="mb-1 text-xs text-(--muted-text)">Example response</dt>
                 <pre className="text-xs font-mono bg-[var(--bg-color)] border border-(--border-color) rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words">
                   {doc.exampleResponse}
                 </pre>
@@ -118,7 +124,7 @@ const PromptsPage = ({ onNavigate }: Props) => {
             <div>
               <button
                 onClick={() => toggle(doc.id)}
-                className="flex items-center justify-between w-full text-xs font-mono uppercase tracking-wider opacity-60 hover:opacity-100 transition-opacity py-2"
+                className="flex w-full items-center justify-between py-2 text-xs text-(--muted-text) hover:text-(--text-color)"
                 type="button"
               >
                 <span>System prompt</span>

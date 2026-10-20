@@ -9,7 +9,7 @@ type MobileSessionBarProps = {
 
 export function MobileSessionBar({ resume, onReset, onToggleFocus }: MobileSessionBarProps) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-center gap-3 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-(--border-color) bg-[var(--bg-color)]/95 backdrop-blur-md">
+    <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-center gap-3 border-t border-(--border-color) bg-(--bg-color) p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <button
         onClick={onReset}
         className="flex h-12 w-12 items-center justify-center rounded-full border border-(--border-color) text-(--text-color) transition-colors hover:bg-(--block-color)"

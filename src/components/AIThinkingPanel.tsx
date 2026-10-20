@@ -29,11 +29,11 @@ export function AIThinkingPanel() {
   return (
     <div className="ai-thinking-panel ai-response-card" aria-live="polite" aria-busy="true">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs font-mono text-blue-400">
+        <div className="flex items-center gap-2 text-sm text-(--muted-text)">
           <Loader2 size={14} className="animate-spin shrink-0" />
           <span>{STATUS_MESSAGES[msgIndex]}</span>
         </div>
-        <span className="text-[11px] font-mono opacity-50 tabular-nums">{elapsed}s</span>
+        <span className="num text-xs text-(--muted-text)">{elapsed}s</span>
       </div>
       <div className="mt-2.5 space-y-1.5">
         {[0, 1, 2].map((i) => (

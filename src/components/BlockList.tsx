@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
 import { GripVertical, Clock, X, Edit3, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
-import { BLOCK_COLORS, BLOCK_EMOJIS, COLOR_SWATCH, getColorDotClass } from '../constants/blockOptions';
+import { BLOCK_COLORS, BLOCK_EMOJIS, COLOR_SWATCH, swatch } from '../constants/blockOptions';
 import type { FlowBlock } from '../utils/dslParser';
 
 const DURATION_PRESETS = [
@@ -46,12 +46,12 @@ type FlagToggleProps = {
 
 function FlagToggle({ checked, onChange, label, hint }: FlagToggleProps) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-2xl border border-(--border-color) bg-(--block-color)/50 px-3 py-3 cursor-pointer">
+    <label className="flex cursor-pointer items-center justify-between gap-3 bg-(--bg-color) px-3 py-3">
       <span className="text-xs min-w-0">
         {label}
         {hint ? <span className="block opacity-45 font-normal mt-0.5">{hint}</span> : null}
       </span>
-      <span className="relative shrink-0 w-10 h-[22px] focus-within:ring-2 focus-within:ring-blue-500/40 rounded-full">
+      <span className="relative h-[22px] w-10 shrink-0 rounded-full">
         <input
           type="checkbox"
           role="switch"
@@ -67,7 +67,7 @@ function FlagToggle({ checked, onChange, label, hint }: FlagToggleProps) {
         />
         <span
           className={clsx(
-            'absolute top-[2px] left-[2px] w-[18px] h-[18px] rounded-full shadow-sm transition-transform pointer-events-none',
+            'absolute top-[2px] left-[2px] w-[18px] h-[18px] rounded-full transition-transform pointer-events-none',
             checked ? 'translate-x-[18px] bg-black' : 'bg-white dark:bg-(--bg-color)'
           )}
         />
@@ -116,7 +116,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
       completed: false,
       active: false,
       description: '',
-      emoji: '✨',
+      emoji: '',
       color: 'orange',
       skippable: false,
       retryable: false,
@@ -155,7 +155,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
 
   return (
     <div className="space-y-2.5">
-      {blocks.map((block, index) => (
+      {blocks.map((block) => (
         <div
           key={block.id}
           role="button"
@@ -168,57 +168,43 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
             }
           }}
           className={clsx(
-            'block-card group w-full text-left flex items-stretch gap-0 rounded-2xl border border-(--border-color) bg-(--block-color)/60 overflow-hidden cursor-pointer',
-            'hover:bg-(--block-color) active:scale-[0.995]',
-            block.active && 'border-(--color-primary)/40 ring-1 ring-(--color-primary)/25',
+            'block-card group w-full text-left flex items-stretch gap-0 overflow-hidden cursor-pointer bg-(--block-color)',
+            selectedBlock?.id === block.id && 'bg-(--surface-elevated)',
             block.completed && 'is-completed'
           )}
-          style={{ '--block-accent': COLOR_SWATCH[block.color] || COLOR_SWATCH.orange }}
+          style={{ '--block-accent': swatch(block.color) }}
         >
           <div
-            className="w-1.5 shrink-0"
-            style={{ backgroundColor: COLOR_SWATCH[block.color] || COLOR_SWATCH.orange }}
+            className="w-1 shrink-0"
+            style={{ backgroundColor: swatch(block.color) }}
             aria-hidden
           />
 
           <div className="flex flex-1 items-start gap-2.5 p-3 min-w-0">
-            <div className="hidden sm:flex cursor-grab opacity-25 group-hover:opacity-55 transition-opacity mt-1 shrink-0">
+            <div className="hidden sm:flex cursor-grab opacity-25 group-hover:opacity-55 mt-1 shrink-0">
               <GripVertical size={16} />
             </div>
 
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-black/10 dark:bg-black/30 text-base">
-              {block.emoji || (
-                <span className={clsx('w-2.5 h-2.5 rounded-full', getColorDotClass(block.color))} />
-              )}
-            </div>
-
-            <div className="flex-1 min-w-0 font-mono text-sm flex flex-col gap-1">
+            <div className="flex-1 min-w-0 text-sm flex flex-col gap-1">
               <div className="flex items-center justify-between gap-2 min-w-0">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[10px] font-mono opacity-35 tabular-nums shrink-0">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span
-                    className={clsx(
-                      'font-semibold truncate',
-                      block.completed && 'line-through opacity-70'
-                    )}
-                  >
-                    {block.label}
-                  </span>
-                </div>
-                <span className="inline-flex items-center gap-1 opacity-70 text-[11px] bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full shrink-0">
-                  <Clock size={11} />
+                <span
+                  className={clsx(
+                    'font-medium truncate',
+                    block.completed && 'line-through opacity-70'
+                  )}
+                >
+                  {block.label}
+                </span>
+                <span className="num inline-flex items-center gap-1 text-xs text-(--muted-text) shrink-0">
+                  <Clock size={12} />
                   {formatDuration(block.duration)}
                 </span>
               </div>
               {block.description && (
-                <p className="text-xs opacity-55 line-clamp-2 leading-relaxed">{block.description}</p>
+                <p className="text-xs text-(--muted-text) line-clamp-2 leading-relaxed">{block.description}</p>
               )}
               {block.completed && (
-                <span className="text-[10px] uppercase tracking-[0.18em] text-emerald-300 opacity-60">
-                  Completed
-                </span>
+                <span className="text-xs text-(--muted-text)">Done</span>
               )}
             </div>
 
@@ -272,22 +258,17 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
             aria-labelledby="edit-block-title"
           >
             <div
-              className="h-1.5 w-full shrink-0 rounded-t-3xl"
-              style={{ backgroundColor: COLOR_SWATCH[draft.color] || COLOR_SWATCH.orange }}
+              className="h-1 w-full shrink-0"
+              style={{ backgroundColor: swatch(draft.color) }}
             />
 
             <div className="flex items-start justify-between gap-3 p-5 pb-3 shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--block-color) border border-(--border-color) text-2xl">
-                  {draft.emoji || '⏱'}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.2em] opacity-40">Edit block</p>
-                  <h3 id="edit-block-title" className="font-mono text-lg font-semibold truncate">
+              <div className="min-w-0">
+                  <p className="text-xs text-(--muted-text)">Edit block</p>
+                  <h3 id="edit-block-title" className="text-lg font-semibold truncate">
                     {draft.label || 'Untitled'}
                   </h3>
                   <p className="text-xs opacity-50 mt-0.5">{formatDuration(draft.duration)}</p>
-                </div>
               </div>
               <button
                 onClick={() => setSelectedBlock(null)}
@@ -302,19 +283,19 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
             <div className="overflow-y-auto px-5 flex-1 min-h-0">
               <div className="grid grid-cols-1 gap-4 pb-4">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider opacity-45 mb-1.5">
+                  <label className="mb-1.5 block text-xs text-(--muted-text)">
                     Label
                   </label>
                   <input
                     type="text"
                     value={draft.label}
                     onChange={(e) => setDraft((prev) => ({ ...prev, label: e.target.value }))}
-                    className="w-full bg-(--block-color) border border-(--border-color) rounded-2xl p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25"
+                    className="input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider opacity-45 mb-1.5">
+                  <label className="mb-1.5 block text-xs text-(--muted-text)">
                     Duration
                   </label>
                   <div className="flex flex-wrap gap-1.5 mb-2.5">
@@ -324,10 +305,10 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                         type="button"
                         onClick={() => setDraft((prev) => ({ ...prev, duration: preset.seconds }))}
                         className={clsx(
-                          'px-2.5 py-1 rounded-full text-[11px] font-mono border transition-all',
+                          'border px-2.5 py-1 text-xs',
                           draft.duration === preset.seconds
-                            ? 'border-white/40 bg-white/10 text-white'
-                            : 'border-(--border-color) opacity-55 hover:opacity-100'
+                            ? 'tab-active'
+                            : 'border-transparent text-(--muted-text) hover:text-(--text-color)'
                         )}
                       >
                         {preset.label}
@@ -336,7 +317,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] opacity-40 mb-1">Minutes</label>
+                      <label className="mb-1 block text-xs text-(--muted-text)">Minutes</label>
                       <input
                         type="number"
                         min={0}
@@ -349,11 +330,11 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                             duration: Math.max(1, minutes * 60 + seconds),
                           }));
                         }}
-                        className="w-full bg-(--block-color) border border-(--border-color) rounded-2xl p-3 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/25"
+                        className="input num"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] opacity-40 mb-1">Seconds</label>
+                      <label className="mb-1 block text-xs text-(--muted-text)">Seconds</label>
                       <input
                         type="number"
                         min={0}
@@ -367,14 +348,14 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                             duration: Math.max(1, minutes * 60 + seconds),
                           }));
                         }}
-                        className="w-full bg-(--block-color) border border-(--border-color) rounded-2xl p-3 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/25"
+                        className="input num"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider opacity-45 mb-2">
+                  <label className="mb-2 block text-xs text-(--muted-text)">
                     Color
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -384,10 +365,10 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                         type="button"
                         onClick={() => setDraft((prev) => ({ ...prev, color }))}
                         className={clsx(
-                          'w-9 h-9 rounded-full border-2 transition-all',
+                          'h-8 w-8 border',
                           draft.color === color
-                            ? 'border-white scale-110 ring-2 ring-offset-2 ring-offset-[var(--bg-color)] ring-white/40'
-                            : 'border-transparent hover:scale-105'
+                            ? 'border-(--text-color)'
+                            : 'border-transparent'
                         )}
                         style={{ backgroundColor: COLOR_SWATCH[color] }}
                         title={color}
@@ -398,7 +379,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider opacity-45 mb-2">
+                  <label className="mb-2 block text-xs text-(--muted-text)">
                     Emoji
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -406,7 +387,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                       type="button"
                       onClick={() => setDraft((prev) => ({ ...prev, emoji: '' }))}
                       className={clsx(
-                        'w-9 h-9 rounded-xl border text-xs opacity-60 hover:opacity-100 transition-all',
+                        'h-8 w-8 border text-xs text-(--muted-text)',
                         !draft.emoji
                           ? 'border-white/40 bg-white/10'
                           : 'border-(--border-color) bg-(--block-color)'
@@ -421,7 +402,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                         type="button"
                         onClick={() => setDraft((prev) => ({ ...prev, emoji }))}
                         className={clsx(
-                          'w-9 h-9 rounded-xl border text-lg transition-all hover:scale-105',
+                          'h-8 w-8 border text-base',
                           draft.emoji === emoji
                             ? 'border-white/40 bg-white/10'
                             : 'border-(--border-color) bg-(--block-color)'
@@ -434,14 +415,14 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider opacity-45 mb-1.5">
+                  <label className="mb-1.5 block text-xs text-(--muted-text)">
                     Description
                   </label>
                   <textarea
                     rows={3}
                     value={draft.description}
                     onChange={(e) => setDraft((prev) => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-(--block-color) border border-(--border-color) rounded-2xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25 resize-none"
+                    className="input resize-none"
                     placeholder="Optional notes for this block…"
                   />
                 </div>
@@ -480,14 +461,14 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
               <div className="flex gap-2">
                 <button
                   onClick={() => setSelectedBlock(null)}
-                  className="flex-1 px-4 py-2.5 rounded-2xl border border-(--border-color) hover:bg-(--block-color) transition-all text-sm opacity-70 hover:opacity-100"
+                  className="btn outline flex-1 px-4 py-2.5 text-sm"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={deleteBlock}
-                  className="flex-1 rounded-xl border border-red-600/25 px-4 py-2.5 text-sm text-red-700 transition-colors hover:bg-red-500/10 dark:text-red-300"
+                  className="btn outline flex-1 px-4 py-2.5 text-sm text-(--pill-negative-ink)"
                   type="button"
                 >
                   Delete

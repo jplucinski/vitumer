@@ -1,7 +1,8 @@
 import clsx from 'clsx';
-import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { FlowBlock } from '../utils/dslParser';
+import { swatch } from '../constants/blockOptions';
 import { AITurnStatus } from '../types/aiSession';
 
 function formatDuration(seconds: number): string {
@@ -29,8 +30,7 @@ export function AISuggestionPreview({
     <div
       className={clsx(
         'ai-response-card ai-suggestion-preview',
-        status === 'rejected' && 'opacity-50',
-        status === 'accepted' && 'ring-1 ring-emerald-500/30'
+        status === 'rejected' && 'opacity-50'
       )}
     >
       <div
@@ -40,9 +40,8 @@ export function AISuggestionPreview({
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && setShowReasoning(!showReasoning)}
       >
-        <div className="flex items-center gap-2 text-xs font-mono text-blue-400">
-          <Sparkles size={14} className={isThinking ? 'animate-spin' : ''} />
-          <span>{isThinking ? 'Model is thinking...' : 'Model Reasoning'}</span>
+        <div className="text-xs text-(--muted-text)">
+          <span>{isThinking ? 'Planning the blocks' : 'Reasoning'}</span>
         </div>
         {!isThinking && (
           <div className="opacity-50">
@@ -52,7 +51,7 @@ export function AISuggestionPreview({
       </div>
 
       {showReasoning && reasoning && (
-        <div className="mt-2 text-xs font-mono opacity-70 leading-relaxed border-t border-(--border-color) pt-2">
+        <div className="mt-2 border-t border-(--border-color) pt-2 text-sm leading-relaxed text-(--muted-text)">
           {reasoning}
         </div>
       )}
@@ -68,15 +67,18 @@ export function AISuggestionPreview({
             {blocks.map((block) => (
               <div
                 key={block.id}
-                className="rounded-lg bg-black/4 dark:bg-black/25 p-2.5 border border-(--border-color) text-xs font-mono"
+                className="flex items-stretch overflow-hidden bg-(--block-color) text-sm"
               >
-                <div className="flex justify-between items-center gap-2">
-                  <span className="font-semibold truncate min-w-0">{block.label}</span>
-                  <span className="opacity-60 shrink-0">{formatDuration(block.duration)}</span>
+                <span className="w-1 shrink-0" style={{ background: swatch(block.color) }} />
+                <div className="min-w-0 flex-1 px-2.5 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="min-w-0 truncate font-medium">{block.label}</span>
+                  <span className="num shrink-0 text-xs text-(--muted-text)">{formatDuration(block.duration)}</span>
                 </div>
                 {block.description && (
-                  <div className="mt-1 text-[11px] opacity-70">{block.description}</div>
+                  <div className="mt-1 text-xs text-(--muted-text)">{block.description}</div>
                 )}
+                </div>
               </div>
             ))}
           </div>

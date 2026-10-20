@@ -1,4 +1,4 @@
-import { Settings, X, FileText } from 'lucide-react';
+import { X, FileText } from 'lucide-react';
 import { ModelPicker } from './ModelPicker';
 import type { ConnectionStatus } from '../hooks/useOpenRouterAuth';
 import type { PromptMode } from '../constants/aiPrompts';
@@ -52,8 +52,7 @@ export function SettingsModal({
         aria-labelledby="settings-title"
       >
         <div className="modal-panel-header">
-          <h3 id="settings-title" className="font-mono text-lg font-semibold flex items-center gap-2">
-            <Settings size={18} className="opacity-50" />
+          <h3 id="settings-title" className="text-base font-semibold">
             Settings
           </h3>
           <button
@@ -66,9 +65,9 @@ export function SettingsModal({
           </button>
         </div>
 
-        <div className="modal-panel-body space-y-4 font-mono text-sm">
+        <div className="modal-panel-body space-y-4 text-sm">
           <div className="surface-card p-4 space-y-3">
-            <label className="block text-xs opacity-50">OpenRouter connection status</label>
+            <label className="block text-xs text-(--muted-text)">OpenRouter</label>
             <div className="flex justify-between items-center">
               {connectionStatus === 'disconnected' && (
                 <span className="badge badge-danger">Not connected</span>
@@ -89,20 +88,20 @@ export function SettingsModal({
                 <button
                   onClick={onUnlockPasskey}
                   disabled={unlockBusy}
-                  className="btn primary w-full text-xs py-2"
+                  className="btn primary w-full py-2 text-sm"
                   type="button"
                 >
                   {unlockBusy ? 'Waiting for passkey…' : 'Unlock with passkey'}
                 </button>
               )}
               {connectionStatus === 'disconnected' ? (
-                <button onClick={onStartConnect} className="btn primary w-full text-xs py-2" type="button">
+                <button onClick={onStartConnect} className="btn primary w-full py-2 text-sm" type="button">
                   Connect OpenRouter via OAuth
                 </button>
               ) : connectionStatus !== 'locked-passkey' ? (
                 <button
                   onClick={onDisconnect}
-                  className="btn outline w-full text-xs py-2 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
+                  className="btn outline w-full py-2 text-sm text-(--pill-negative-ink)"
                   type="button"
                 >
                   Disconnect OpenRouter
@@ -110,7 +109,7 @@ export function SettingsModal({
               ) : (
                 <button
                   onClick={onDisconnect}
-                  className="btn outline w-full text-xs py-2 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
+                  className="btn outline w-full py-2 text-sm text-(--pill-negative-ink)"
                   type="button"
                 >
                   Delete vault & disconnect
@@ -120,11 +119,11 @@ export function SettingsModal({
           </div>
 
           <div>
-            <label className="block text-xs opacity-50 mb-1">Timer visual theme</label>
+            <label className="mb-1.5 block text-xs text-(--muted-text)">Theme</label>
             <select
               value={theme}
               onChange={(e) => onThemeChange(e.target.value)}
-              className="select w-full rounded-lg p-2.5"
+              className="select"
             >
               <option value="aura">Aura (Default)</option>
               <option value="cyberpunk">Cyberpunk</option>
@@ -134,7 +133,7 @@ export function SettingsModal({
           </div>
 
           <div>
-            <label className="block text-xs opacity-50 mb-1">Default Model ID (OpenRouter)</label>
+            <label className="mb-1.5 block text-xs text-(--muted-text)">Model</label>
             <ModelPicker
               value={modelId}
               label={modelLabel || undefined}
@@ -162,14 +161,14 @@ export function SettingsModal({
 
           <button
             onClick={onNavigatePrompts}
-            className="w-full text-left text-xs font-mono opacity-60 hover:opacity-100 transition-opacity flex items-center gap-2 py-2"
+            className="flex w-full items-center gap-2 py-2 text-left text-sm text-(--muted-text) hover:text-(--text-color)"
             type="button"
           >
             <FileText size={14} />
             View AI prompts →
           </button>
 
-          <p className="text-[10px] sm:text-[11px] opacity-60 leading-relaxed break-words mt-2">
+          <p className="mt-2 text-xs leading-relaxed break-words text-(--muted-text)">
             <strong>Warning:</strong> Frontend-only app. Keys never hit our servers. They go only to OpenRouter.
             Passkey vault encrypts the key at rest in this browser; after unlock it lives in session
             memory and is visible to scripts on this origin (XSS).
@@ -179,14 +178,14 @@ export function SettingsModal({
         <div className="modal-panel-footer">
           <button
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-xs text-(--text-color) transition-colors hover:bg-(--block-color)"
+            className="btn outline px-4 py-2 text-sm"
             type="button"
           >
             Cancel
           </button>
           <button
             onClick={onSave}
-            className="btn btn-primary-solid px-4 py-2 text-xs font-semibold"
+            className="btn btn-primary-solid px-4 py-2 text-sm"
             type="button"
           >
             Save Settings

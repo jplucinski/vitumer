@@ -1,4 +1,3 @@
-import { Sparkles, QrCode } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { FlowBlock } from '../utils/dslParser';
 import type { RestoredTimer } from '../utils/timerProgress';
@@ -26,10 +25,10 @@ type HomeViewProps = {
   onRefreshAdvice: () => void;
   onOpenSettings: () => void;
   onModelChange: (id: string, label?: string) => void;
+  connectionLabel: string;
 };
 
 export function HomeView({
-  isDesktop,
   blocks,
   setBlocks,
   resume,
@@ -46,69 +45,66 @@ export function HomeView({
   onRefreshAdvice,
   onOpenSettings,
   onModelChange,
+  connectionLabel,
 }: HomeViewProps) {
   return (
-    <div className="mt-2 grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
-      <div className="flex min-w-0 flex-col gap-6 lg:col-span-5">
-        {isDesktop && (
-          <SessionLaunchCard
-            blocks={blocks}
-            onStart={onStartFocus}
-            onReset={onResetSession}
-            resume={resume}
-          />
-        )}
+    <div>
+      <SessionLaunchCard
+        blocks={blocks}
+        onStart={onStartFocus}
+        onReset={onResetSession}
+        resume={resume}
+        connectionLabel={connectionLabel}
+      />
 
-        {apiKey ? (
+      {apiKey ? (
+        <div className="mt-6">
           <AIFeedback
             message={aiAdvice}
             type="suggestion"
             onRefresh={onRefreshAdvice}
             isLoading={isLoadingAdvice}
           />
-        ) : (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-3xl border border-(--border-color) bg-(--block-color) p-5 sm:flex-row">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-zinc-500">
-                <Sparkles size={16} />
-              </div>
-              <div className="text-sm leading-relaxed opacity-70">
-                Connect <strong>OpenRouter</strong> to get personalized AI advice and unlock the full assistant.
-              </div>
-            </div>
-            <button onClick={onStartConnect} className="btn primary shrink-0 px-4 py-1.5 text-xs" type="button">
-              Connect OpenRouter
-            </button>
-          </div>
-        )}
+        </div>
+      ) : (
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 bg-(--block-color) px-4 py-3 sm:flex-row sm:items-center">
+          <p className="text-sm leading-relaxed text-(--muted-text)">
+            Connect OpenRouter to draft blocks from a sentence.
+          </p>
+          <button onClick={onStartConnect} className="btn outline shrink-0 px-4 py-2 text-sm" type="button">
+            Connect OpenRouter
+          </button>
+        </div>
+      )}
 
-        <div>
-          <div className="mb-4 flex items-end justify-between px-1">
-            <h2 className="text-sm font-medium">This session</h2>
+      <div className="session-grid">
+        <section className="min-w-0">
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <h2 className="screen-section">Blocks</h2>
             <button
               onClick={onShareQr}
-              className="flex min-h-11 items-center gap-1.5 px-2 text-xs font-medium opacity-60 transition-opacity hover:opacity-100"
+              className="mb-3 min-h-11 px-1 text-sm text-(--muted-text) hover:text-(--text-color)"
               type="button"
             >
-              <QrCode size={14} />
               Share as QR
             </button>
           </div>
           <BlockList blocks={blocks} setBlocks={setBlocks} />
-        </div>
-      </div>
+        </section>
 
-      <div className="min-w-0 lg:col-span-7">
-        <CommandBar
-          blocks={blocks}
-          setBlocks={setBlocks}
-          apiKey={apiKey}
-          modelId={modelId}
-          modelLabel={modelLabel}
-          promptMode={promptMode}
-          onOpenSettings={onOpenSettings}
-          onModelChange={onModelChange}
-        />
+        <section className="min-w-0">
+          <h2 className="screen-section">Build</h2>
+          <CommandBar
+            blocks={blocks}
+            setBlocks={setBlocks}
+            apiKey={apiKey}
+            modelId={modelId}
+            modelLabel={modelLabel}
+            promptMode={promptMode}
+            onOpenSettings={onOpenSettings}
+            onModelChange={onModelChange}
+          />
+        </section>
       </div>
     </div>
   );

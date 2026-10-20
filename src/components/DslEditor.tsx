@@ -13,16 +13,16 @@ interface DslEditorProps {
 }
 
 const TOKEN_CLASS: Record<DslTokenKind, string> = {
-  multiplier: 'text-violet-600 dark:text-violet-300',
+  multiplier: 'text-(--text-color)',
   operator: 'text-(--muted-text)',
-  paren: 'text-violet-600 dark:text-violet-300',
-  duration: 'text-orange-600 dark:text-orange-300',
+  paren: 'text-(--muted-text)',
+  duration: 'text-(--color-work)',
   label: 'text-(--text-color)',
-  description: 'text-emerald-700 dark:text-emerald-300',
-  attrKey: 'text-sky-700 dark:text-sky-300',
-  attrValue: 'text-amber-700 dark:text-amber-300',
+  description: 'text-(--muted-text)',
+  attrKey: 'text-(--muted-text)',
+  attrValue: 'text-(--color-rest)',
   punct: 'text-(--muted-text)',
-  invalid: 'text-rose-600 dark:text-rose-300',
+  invalid: 'text-(--pill-negative-ink)',
 };
 
 const SHARED_TEXT = 'p-4 pr-16 font-mono text-sm leading-6 whitespace-pre-wrap [overflow-wrap:anywhere]';
@@ -54,14 +54,14 @@ export function DslEditor({ value, analysis, onChange, onSubmit, onFocus, onBlur
   }, [value]);
 
   return (
-    <div className="relative rounded-2xl border border-(--border-color) bg-(--bg-color)/50 focus-within:border-blue-400/50 focus-within:ring-2 focus-within:ring-blue-500/20">
+    <div className="dsl-editor relative">
       <pre aria-hidden className={clsx(SHARED_TEXT, 'pointer-events-none absolute inset-0 m-0 overflow-hidden')}>
         {segments.map((s, i) => (
           <span
             key={i}
             className={clsx(
               s.kind && TOKEN_CLASS[s.kind],
-              s.error && 'underline decoration-rose-500 decoration-wavy underline-offset-4',
+              s.error && 'dsl-token-error',
             )}
           >
             {s.text}
@@ -88,7 +88,7 @@ export function DslEditor({ value, analysis, onChange, onSubmit, onFocus, onBlur
         aria-invalid={analysis.diagnostics.length > 0}
         className={clsx(
           SHARED_TEXT,
-          'relative block w-full resize-none overflow-hidden bg-transparent text-transparent caret-(--text-color) outline-none placeholder:text-(--muted-text) selection:bg-blue-500/25',
+          'relative block w-full resize-none overflow-hidden bg-transparent text-transparent caret-(--text-color) outline-none placeholder:text-(--muted-text) selection:bg-(--surface-elevated)',
         )}
         placeholder={placeholder}
       />

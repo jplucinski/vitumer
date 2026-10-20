@@ -12,7 +12,7 @@ export const MOCK_BLOCKS: FlowBlock[] = [
     label: 'pomo',
     completed: false,
     description: 'Warmup, emails',
-    emoji: '☕',
+    emoji: '\u2615',
     color: 'orange',
   },
   {
@@ -21,7 +21,7 @@ export const MOCK_BLOCKS: FlowBlock[] = [
     label: 'break',
     completed: false,
     description: 'Step away, water',
-    emoji: '💧',
+    emoji: '\u{1F4A7}',
     color: 'teal',
   },
   {
@@ -30,7 +30,7 @@ export const MOCK_BLOCKS: FlowBlock[] = [
     label: 'pomo',
     completed: false,
     description: 'Main work — UI/UX project',
-    emoji: '🎨',
+    emoji: '\u{1F3A8}',
     color: 'orange',
   },
   {
@@ -39,7 +39,7 @@ export const MOCK_BLOCKS: FlowBlock[] = [
     label: 'break',
     completed: false,
     description: 'Stretching',
-    emoji: '🧘',
+    emoji: '\u{1F9D8}',
     color: 'teal',
   },
   {
@@ -48,7 +48,7 @@ export const MOCK_BLOCKS: FlowBlock[] = [
     label: 'pomo',
     completed: false,
     description: 'Implement views',
-    emoji: '💻',
+    emoji: '\u{1F4BB}',
     color: 'orange',
   },
 ];

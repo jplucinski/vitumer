@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { decodeFlowParam, encodeFlowParam, buildShareUrl } from './shareFlow';
 
 const EMOJI_DSL =
-  '25m pomo {Warmup, emails} [color:orange, emoji:☕] + 5m break {Step away, water} [color:teal, emoji:💧]';
+  '25m pomo {Warmup, emails} [color:orange, emoji:\u{2615}] + 5m break {Step away, water} [color:teal, emoji:\u{1F4A7}]';
 
-const LEGACY_PLUS_DSL = '100m block [emoji:🔥] + 1m rest';
+const LEGACY_PLUS_DSL = '100m block [emoji:\u{1F525}] + 1m rest';
 
 describe('encodeFlowParam / decodeFlowParam', () => {
   it('round-trips DSL with emoji and plus separators', () => {

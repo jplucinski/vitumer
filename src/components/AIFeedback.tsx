@@ -10,7 +10,7 @@ type Props = {
 
 const AIFeedback = ({ message, onRefresh, isLoading = false }: Props) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-3 p-4 rounded-lg bg-blue-50/10 border border-blue-500/20 backdrop-blur-sm shadow-sm animate-in fade-in duration-300">
+    <div className="flex flex-col items-start gap-3 bg-(--block-color) p-4 sm:flex-row">
       <div className={`mt-0.5 text-blue-400 ${isLoading ? 'animate-spin' : ''}`}>
         <Sparkles size={16} />
       </div>

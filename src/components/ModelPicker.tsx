@@ -160,7 +160,7 @@ export function ModelPicker({ value, label, onChange, apiKey, variant = 'default
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as ModelSort)}
-            className="select flex-1 rounded-lg p-2 text-xs"
+            className="select flex-1 text-sm"
             aria-label="Sort models"
           >
             <option value="most-popular">Popular</option>
@@ -174,7 +174,7 @@ export function ModelPicker({ value, label, onChange, apiKey, variant = 'default
         <input
           ref={inputRef}
           type="text"
-          className="input w-full rounded-lg p-2.5 pr-9"
+          className="input w-full pr-9"
           placeholder="Search OpenRouter models..."
           value={inputValue}
           onChange={(e) => {
@@ -207,13 +207,13 @@ export function ModelPicker({ value, label, onChange, apiKey, variant = 'default
       </div>
 
       {showCustomBadge && (
-        <span className="inline-block mt-1.5 text-[10px] uppercase tracking-wide opacity-50">
+        <span className="mt-1.5 inline-block text-xs text-(--muted-text)">
           Custom model
         </span>
       )}
 
       {error && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-red-400">
+        <div className="mt-2 flex items-center gap-2 text-xs text-(--pill-negative-ink)">
           <span className="flex-1 truncate">{error}</span>
           <button
             type="button"

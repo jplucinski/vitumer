@@ -10,7 +10,7 @@ interface AIAgentsPageProps {
 const POMO_LINK =
   'https://vitumer.jplucinski.dev/?flow=MyAqICgyNW0gcG9tbyBbY29sb3I6b3JhbmdlXSArIDVtIGJyZWFrIFtjb2xvcjp0ZWFsXSk=';
 const KNEE_DSL =
-  '4 * (3m stretch {Knee mobility} [emoji:🦵, color:teal] + 2m rest [emoji:💧, color:teal])';
+  '4 * (3m stretch {Knee mobility} [emoji:\u{1F9B5}, color:teal] + 2m rest [emoji:\u{1F4A7}, color:teal])';
 const KNEE_LINK =
   'https://vitumer.jplucinski.dev/?flow=NCAqICgzbSBzdHJldGNoIHtLbmVlIG1vYmlsaXR5fSBbZW1vamk68J+mtSwgY29sb3I6dGVhbF0gKyAybSByZXN0IFtlbW9qaTrwn5KnLCBjb2xvcjp0ZWFsXSk=';
 
@@ -32,7 +32,7 @@ const CASES = [
   {
     title: 'HIIT',
     request: '5-minute HIIT',
-    dsl: '10 * (20s work [emoji:💪, color:orange] + 10s rest [color:teal])',
+    dsl: '10 * (20s work [emoji:\u{1F4AA}, color:orange] + 10s rest [color:teal])',
     seed: 'sprint',
   },
   {
@@ -49,11 +49,16 @@ export default function AIAgentsPage({ onNavigate }: AIAgentsPageProps) {
 
   return (
     <div className="app-container min-h-screen overflow-x-hidden">
-      <AppNav variant="subpage" onBack={() => onNavigate('/')} />
+      <AppNav
+        variant="subpage"
+        onBack={() => onNavigate('/')}
+        onNavigateHome={() => onNavigate('/')}
+        onNavigatePrompts={() => onNavigate('/prompts')}
+      />
 
-      <main ref={revealRef} className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 pb-24 sm:px-6 lg:px-8">
-        <section className="py-8" data-reveal>
-          <h2 className="text-lg font-semibold">What an agent should return</h2>
+      <main ref={revealRef} className="app-canvas overflow-x-hidden px-4 pb-24 pt-6 sm:px-6 lg:px-8">
+        <section className="pb-8" data-reveal>
+          <h1 className="screen-title">Agent returns</h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-80">
             Vitumer is a frontend-only timer. There is no API. When someone asks you to create a session on{' '}
             <span className="font-mono text-base">https://vitumer.jplucinski.dev/</span>, return English DSL plus one ready share link.
@@ -87,7 +92,7 @@ export default function AIAgentsPage({ onNavigate }: AIAgentsPageProps) {
                   alt=""
                   className="absolute inset-0 h-full w-full object-cover opacity-45 contrast-125 grayscale mix-blend-luminosity transition-transform duration-700 ease-out group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-black/10" />
+                <div className="absolute inset-0 bg-black/55" />
                 <div className="relative text-white">
                   <h3 className="text-2xl font-medium">{item.title}</h3>
                   <p className="mt-2 line-clamp-2 text-sm text-white/80">{item.request}</p>
@@ -123,7 +128,7 @@ export default function AIAgentsPage({ onNavigate }: AIAgentsPageProps) {
           <div className="grid auto-rows-[9rem] grid-flow-dense grid-cols-1 gap-4 md:grid-cols-4">
             <div className="rounded-3xl border border-(--border-color) bg-(--block-color) p-5 md:col-span-2 md:row-span-2">
               <p className="text-sm opacity-60">Single block</p>
-              <code className="mt-3 block font-mono text-sm">25m work [emoji:💻, color:orange]</code>
+              <code className="mt-3 block font-mono text-sm">{'25m work [emoji:\u{1F4BB}, color:orange]'}</code>
             </div>
             <div className="rounded-3xl border border-(--border-color) bg-(--block-color) p-5 md:col-span-2">
               <p className="text-sm opacity-60">Sequence</p>

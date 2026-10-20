@@ -49,7 +49,7 @@ Each item in "suggestions" must include:
 Forbidden in output: "id", "completed", loop multipliers, shorthand. Expand loops fully. Integer seconds only (25 min = 1500).`;
 
 const BLOCK_FIELD_RULES = `Field rules:
-- emoji: required on every block. Context-appropriate (📚 study, ⚡ HIIT, ☕ break/coffee).
+- emoji: required on every block. Context-appropriate (\u{1F4DA} study, \u{26A1} HIIT, \u{2615} break/coffee).
 - color: required. Rest/break labels → teal. Focus/work → orange. Override when task implies (meditation → purple).
 - label: short, lowercase, DSL-friendly: pomo, break, work, rest, warmup, cooldown.
 - description: include only when user request implies activity detail; omit for generic HIIT/pomodoro.
@@ -68,12 +68,12 @@ const BLOCK_EXAMPLES = `Example for "3 study sessions of 25 min with 5 min break
 {
   "reasoning": "Three Pomodoro cycles with short breaks between focus blocks.",
   "blocks": [
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"},
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"},
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"}
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"},
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"},
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"}
   ],
   "suggestions": [
     {"label": "10 min breaks", "text": "Make every break 10 minutes instead of 5"},
@@ -87,14 +87,14 @@ Example for "HIIT 4 rounds: 40s work and 20s rest":
 {
   "reasoning": "Four HIIT rounds alternating short work and rest intervals.",
   "blocks": [
-    {"duration": 40, "label": "work", "color": "orange", "emoji": "⚡"},
-    {"duration": 20, "label": "rest", "color": "teal", "emoji": "💧"},
-    {"duration": 40, "label": "work", "color": "orange", "emoji": "⚡"},
-    {"duration": 20, "label": "rest", "color": "teal", "emoji": "💧"},
-    {"duration": 40, "label": "work", "color": "orange", "emoji": "⚡"},
-    {"duration": 20, "label": "rest", "color": "teal", "emoji": "💧"},
-    {"duration": 40, "label": "work", "color": "orange", "emoji": "⚡"},
-    {"duration": 20, "label": "rest", "color": "teal", "emoji": "💧"}
+    {"duration": 40, "label": "work", "color": "orange", "emoji": "\u{26A1}"},
+    {"duration": 20, "label": "rest", "color": "teal", "emoji": "\u{1F4A7}"},
+    {"duration": 40, "label": "work", "color": "orange", "emoji": "\u{26A1}"},
+    {"duration": 20, "label": "rest", "color": "teal", "emoji": "\u{1F4A7}"},
+    {"duration": 40, "label": "work", "color": "orange", "emoji": "\u{26A1}"},
+    {"duration": 20, "label": "rest", "color": "teal", "emoji": "\u{1F4A7}"},
+    {"duration": 40, "label": "work", "color": "orange", "emoji": "\u{26A1}"},
+    {"duration": 20, "label": "rest", "color": "teal", "emoji": "\u{1F4A7}"}
   ],
   "suggestions": [
     {"label": "30s work", "text": "Change work intervals to 30 seconds"},
@@ -108,9 +108,9 @@ Example for "5 min aeropress, hold after brew before I pour":
 {
   "reasoning": "Short brew ritual with a hold so the next slot waits for a tap after the pour-ready brew.",
   "blocks": [
-    {"duration": 60, "label": "prep", "color": "amber", "emoji": "☕", "description": "Rinse filter, heat water"},
-    {"duration": 240, "label": "brew", "color": "orange", "emoji": "☕", "description": "Bloom and press", "hold": true},
-    {"duration": 120, "label": "rest", "color": "teal", "emoji": "💧"}
+    {"duration": 60, "label": "prep", "color": "amber", "emoji": "\u{2615}", "description": "Rinse filter, heat water"},
+    {"duration": 240, "label": "brew", "color": "orange", "emoji": "\u{2615}", "description": "Bloom and press", "hold": true},
+    {"duration": 120, "label": "rest", "color": "teal", "emoji": "\u{1F4A7}"}
   ],
   "suggestions": [
     {"label": "Skip hold", "text": "Remove the hold after the brew block"},
@@ -191,12 +191,12 @@ export const AI_PROMPT_DOCS: AIPromptDoc[] = [
     exampleResponse: `{
   "reasoning": "Three Pomodoro cycles with short breaks between focus blocks.",
   "blocks": [
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"},
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"},
-    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "📚"},
-    {"duration": 300, "label": "break", "color": "teal", "emoji": "☕"}
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"},
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"},
+    {"duration": 1500, "label": "pomo", "color": "orange", "emoji": "\u{1F4DA}"},
+    {"duration": 300, "label": "break", "color": "teal", "emoji": "\u{2615}"}
   ],
   "suggestions": [
     {"label": "10 min breaks", "text": "Make every break 10 minutes instead of 5"},
@@ -234,7 +234,7 @@ export const AI_PROMPT_DOCS: AIPromptDoc[] = [
     exampleUser:
       '1. pomo (25 min, orange): Warmup, emails\n2. break (5 min, teal): Step away, water\n3. pomo (25 min, orange): Main work',
     exampleResponse:
-      '☕ Your third focus block is the longest stretch — consider a slightly longer break before it so you finish strong.',
+      '\u{2615} Your third focus block is the longest stretch — consider a slightly longer break before it so you finish strong.',
     getSystemPrompt: () => SESSION_ADVICE_PROMPT,
   },
 ];
