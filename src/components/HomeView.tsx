@@ -100,6 +100,7 @@ export function HomeView({
 
       <div className="min-w-0 lg:col-span-7">
         <CommandBar
+          blocks={blocks}
           setBlocks={setBlocks}
           apiKey={apiKey}
           modelId={modelId}
