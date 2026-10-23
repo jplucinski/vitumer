@@ -96,11 +96,11 @@ const CommandBar: React.FC<CommandBarProps> = ({
 
   return (
     <div className="command-workspace space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:max-h-[calc(100dvh-2rem)] lg:overflow-hidden lg:flex lg:flex-col">
-      <section className="surface-card overflow-hidden rounded-3xl border border-(--border-color) bg-(--block-color) shadow-sm lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-        <div className="flex items-center gap-1 p-2 border-b border-(--border-color) bg-black/[0.02] dark:bg-white/[0.02]">
+      <section className="surface-card overflow-hidden bg-(--block-color) lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+        <div className="flex items-end gap-5 border-b border-(--border-color) px-4">
           <button
             className={clsx(
-              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
+              'px-0.5 py-3 text-sm',
               activeTab === 'ai'
                 ? 'tab-active'
                 : 'text-(--muted-text) hover:text-(--text-color)'
@@ -108,11 +108,11 @@ const CommandBar: React.FC<CommandBarProps> = ({
             onClick={() => setActiveTab('ai')}
             type="button"
           >
-            AI Prompting
+            AI prompting
           </button>
           <button
             className={clsx(
-              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
+              'px-0.5 py-3 text-sm',
               activeTab === 'dsl'
                 ? 'tab-active'
                 : 'text-(--muted-text) hover:text-(--text-color)'
@@ -120,7 +120,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
             onClick={() => setActiveTab('dsl')}
             type="button"
           >
-            DSL Editor
+            DSL editor
           </button>
         </div>
 
@@ -160,7 +160,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
                 disabled={dslAnalysis.diagnostics.length > 0}
                 aria-label="Apply DSL (Ctrl+Enter)"
                 title="Apply (Ctrl+Enter)"
-                className="absolute right-3 bottom-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-(--text-color) text-(--bg-color) transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+                className="absolute right-3 bottom-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-(--text-color) text-(--bg-color) disabled:cursor-not-allowed disabled:opacity-40"
                 type="button"
               >
                 <CornerDownLeft size={15} />
@@ -170,7 +170,7 @@ const CommandBar: React.FC<CommandBarProps> = ({
             {dslAnalysis.diagnostics.length > 0 && (
               <ul
                 aria-live="polite"
-                className="space-y-1 rounded-xl border border-rose-600/20 bg-rose-500/10 px-3 py-2.5 font-mono text-xs text-rose-800 dark:text-rose-200"
+                className="alert alert-danger space-y-1 px-3 py-2.5 font-mono text-xs"
               >
                 {dslAnalysis.diagnostics.slice(0, 5).map((d) => {
                   const { line, column } = getLineColumn(dslInput, d.start);
@@ -187,26 +187,23 @@ const CommandBar: React.FC<CommandBarProps> = ({
             )}
 
             {dslError && (
-              <div className="rounded-xl border border-rose-600/20 bg-rose-500/10 px-3 py-2.5 font-mono text-xs text-rose-800 dark:text-rose-200">
+              <div className="alert alert-danger px-3 py-2.5 text-sm">
                 {dslError}
               </div>
             )}
 
-            <div className="rounded-2xl border border-(--border-color) bg-(--bg-color)/40 p-4 text-sm font-mono space-y-3">
-              <div className="flex items-center justify-between text-xs text-(--muted-text)">
-                <span>DSL Reference Guide</span>
-                <span>Syntax</span>
-              </div>
-              <ul className="space-y-1 text-[12px] opacity-60">
+            <div className="space-y-3 bg-(--bg-color) p-4 text-sm">
+              <p className="text-xs text-(--muted-text)">Syntax</p>
+              <ul className="space-y-1 font-mono text-xs text-(--muted-text)">
                 {DSL_SYNTAX_LINES.map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px] opacity-60">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {DSL_REFERENCE_EXAMPLES.map((example) => (
                   <div key={example.title}>
-                    <p className="font-semibold text-[11px] uppercase opacity-70">{example.title}</p>
-                    <p className="break-all overflow-x-auto">{example.dsl}</p>
+                    <p className="text-sm">{example.title}</p>
+                    <p className="mt-1 overflow-x-auto font-mono text-xs break-all text-(--muted-text)">{example.dsl}</p>
                   </div>
                 ))}
               </div>
@@ -218,10 +215,10 @@ const CommandBar: React.FC<CommandBarProps> = ({
       {feedbackMessage && (
         <div
           className={clsx(
-            'px-4 py-2.5 text-sm font-medium rounded-xl',
-            feedbackType === 'success' && 'border border-emerald-600/20 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200',
-            feedbackType === 'error' && 'border border-rose-600/20 bg-rose-500/10 text-rose-800 dark:text-rose-200',
-            feedbackType === 'info' && 'border border-(--border-color) bg-(--block-color) text-(--text-color)'
+            'px-4 py-2.5 text-sm',
+            feedbackType === 'success' && 'bg-(--pill-positive-bg) text-(--pill-positive-ink)',
+            feedbackType === 'error' && 'bg-(--pill-negative-bg) text-(--pill-negative-ink)',
+            feedbackType === 'info' && 'bg-(--surface-elevated) text-(--text-color)'
           )}
         >
           {feedbackMessage}

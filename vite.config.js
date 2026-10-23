@@ -42,8 +42,8 @@ export default defineConfig({
         description: 'Hybrid AI Agent Timer for task focus and time planning',
         start_url: '/',
         display: 'standalone',
-        background_color: '#0f172a',
-        theme_color: '#7c3aed',
+        background_color: '#171719',
+        theme_color: '#171719',
         icons: [
           {
             src: '/favicon.svg',

@@ -46,7 +46,7 @@ export const Chat = ({ apiKey, onDisconnect }: Props) => {
       <div className="messages p-3 mb-3 overflow-y-auto" style={{ maxHeight: '400px' }}>
         {messages.map((msg, i) => (
           <div key={i} className={msg.role === 'assistant' ? 'assistant-msg' : 'user-msg'}>
-            <strong>{msg.role === 'assistant' ? '🤖' : '🧑'}:</strong> {msg.content}
+            <strong>{msg.role === 'assistant' ? 'Assistant' : 'You'}:</strong> {msg.content}
           </div>
         ))}
         {loading && <div className="loading">Generating response...</div>}

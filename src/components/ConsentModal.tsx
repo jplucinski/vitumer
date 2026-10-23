@@ -17,12 +17,12 @@ export function ConsentModal({
 }: ConsentModalProps) {
   return (
     <div className="modal-backdrop">
-      <div className="modal glass text-left max-w-md">
-        <h3 className="text-lg font-bold mb-4">Connected to OpenRouter</h3>
-        <p className="text-sm opacity-80 leading-relaxed mb-4">
+      <div className="modal text-left">
+        <h3 className="mb-3 text-base font-semibold">Connected to OpenRouter</h3>
+        <p className="mb-4 text-sm leading-relaxed text-(--muted-text)">
           Choose how to keep the key on this device. Nothing is sent to Vitumer servers.
         </p>
-        <ul className="text-xs opacity-70 space-y-2 mb-6 list-disc pl-4">
+        <ul className="mb-6 list-disc space-y-2 pl-4 text-sm text-(--muted-text)">
           <li>
             <strong>Session only:</strong> plaintext in this tab until you close it.
           </li>
@@ -55,7 +55,7 @@ export function ConsentModal({
           </button>
         </div>
         {!prfAvailable && (
-          <p className="text-[10px] opacity-50 mt-3">
+          <p className="mt-3 text-xs text-(--muted-text)">
             Passkey PRF unavailable here. Use session only, or try Chrome, Edge, or Safari on a device with
             a platform authenticator.
           </p>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Check, Code2, CornerDownLeft, Pencil, RotateCcw, Sparkles, X } from 'lucide-react';
+import { Check, Code2, CornerDownLeft, Pencil, RotateCcw, X } from 'lucide-react';
 import { FlowBlock } from '../utils/dslParser';
 import { stringifyBlocks } from '../utils/dslSchema';
 import { useAISessionThread } from '../hooks/useAISessionThread';
@@ -61,13 +61,13 @@ function UserTurnBubble({
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
           rows={3}
-          className="w-full bg-transparent text-white placeholder-white/50 outline-none resize-none text-sm font-mono"
+          className="w-full resize-none bg-transparent text-sm text-(--text-color) outline-none placeholder:text-(--muted-text)"
           autoFocus
         />
         <div className="flex gap-2">
           <button
             onClick={handleResend}
-            className="px-3 py-1 rounded-lg bg-white/20 text-xs font-semibold hover:bg-white/30"
+            className="btn btn-primary-solid px-3 py-1 text-xs"
             type="button"
           >
             Resend
@@ -77,7 +77,7 @@ function UserTurnBubble({
               setEditText(turn.userMessage);
               setIsEditing(false);
             }}
-            className="px-3 py-1 rounded-lg bg-white/10 text-xs font-semibold hover:bg-white/20"
+            className="btn outline px-3 py-1 text-xs"
             type="button"
           >
             Cancel
@@ -215,30 +215,19 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
 
   return (
     <div className="ai-session-panel">
-      <div className="ai-session-header">
-        <div className="flex items-center gap-2 min-w-0">
-          <Sparkles size={15} className="text-blue-400 shrink-0" />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold leading-tight">Session builder</p>
-            <p className="text-[11px] font-mono opacity-45">
-              {hasConversation
-                ? `${thread.turns.length} turn${thread.turns.length === 1 ? '' : 's'}`
-                : 'Natural language → timed blocks'}
-            </p>
-          </div>
-        </div>
-        {thread.turns.length > 0 && (
+      {thread.turns.length > 0 && (
+        <div className="ai-session-header">
           <button
             onClick={resetThread}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold opacity-55 hover:opacity-100 border border-(--border-color) hover:bg-white/5 transition-all shrink-0"
+            className="flex items-center gap-1.5 border border-(--control) px-2.5 py-1.5 text-xs text-(--muted-text) hover:text-(--text-color)"
             type="button"
             aria-label="Clear conversation"
           >
             <RotateCcw size={12} />
             Clear
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div
         className={clsx(
@@ -257,7 +246,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
                   key={prompt}
                   type="button"
                   onClick={() => handleChipClick(prompt)}
-                  className="px-3 py-1.5 rounded-full text-[11px] font-mono border border-(--border-color) bg-black/3 dark:bg-white/4 hover:bg-black/6 dark:hover:bg-white/8 transition-colors text-left"
+                  className="ai-chip"
                 >
                   {prompt}
                 </button>
@@ -297,7 +286,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
       </div>
 
       {error && (
-        <div className="mx-3 mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs text-red-200 font-mono space-y-2">
+        <div className="alert alert-danger mx-3 mb-2 space-y-2 px-3 py-2.5 text-xs">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-1">
               <p>{error.message}</p>
@@ -379,7 +368,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
               disabled={isThinking}
               aria-busy={isThinking}
               aria-label="Session prompt"
-              className="ai-composer w-full pl-3.5 pr-11 py-2.5 bg-transparent border-0 outline-none font-mono text-sm placeholder:text-(--muted-text) placeholder:opacity-80 resize-none"
+              className="ai-composer w-full resize-none border-0 bg-transparent py-2.5 pr-11 pl-3.5 text-sm outline-none placeholder:text-(--muted-text)"
               placeholder={placeholder}
               value={composerText}
               onChange={(e) => setComposerText(e.target.value)}
@@ -429,7 +418,7 @@ const AISessionThread: React.FC<AISessionThreadProps> = ({
         </div>
 
         {!pendingActions && (
-          <p className="mt-2 px-1 font-mono text-[11px] leading-relaxed text-(--muted-text)">
+          <p className="mt-2 px-1 text-xs leading-relaxed text-(--muted-text)">
             Model: {(modelLabel || modelId).trim()}. Enter to send. Shift+Enter for a new line.
             {!apiKey && ' Connect OpenRouter in Settings.'}
           </p>

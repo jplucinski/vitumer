@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Square, SkipForward, ChevronUp, ChevronDown, RotateCcw, RefreshCcw, Volume2, VolumeX, X } from 'lucide-react';
 import clsx from 'clsx';
 import { FlowBlock } from '../utils/dslParser';
-import { getColorBadgeClasses, getColorBorderClass, getColorPulseClass } from '../constants/blockOptions';
+import { swatch } from '../constants/blockOptions';
 import { STORAGE_KEYS } from '../constants/storageKeys';
 import { FOCUS_IMMERSIVE_QUERY } from '../constants/breakpoints';
 import { resolveTimerZeroAction, restoreTimerProgress, type RestoredTimer, type TimerProgress } from '../utils/timerProgress';
@@ -342,15 +342,11 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
         {activeBlock && (
           <div className="relative z-10 flex gap-4">
-            <div className={clsx(
-              'mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-(--bg-color)',
-              getColorBorderClass(activeBlock.color)
-            )}>
-              <div className={clsx('h-2.5 w-2.5 rounded-full motion-safe:animate-pulse', getColorPulseClass(activeBlock.color))} />
+            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-(--bg-color)">
+              <div className="h-2.5 w-2.5 rounded-full" style={{ background: swatch(activeBlock.color) }} />
             </div>
-            <div className="font-mono text-sm font-semibold">
+            <div className="text-sm font-semibold">
               <div className="flex items-center gap-1.5">
-                {activeBlock.emoji && <span>{activeBlock.emoji}</span>}
                 {activeBlock.label}
               </div>
               <div className="flex gap-2 text-xs font-normal text-(--muted-text)">
@@ -386,23 +382,11 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             if (awaitingNext) handleBlockCompleted();
           }}
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 40%, var(--accent-glow), transparent 55%)',
-            }}
-          />
           {!(awaitingNext && nextBlock) && (
             <>
-          <div className={clsx(
-            'focus-split-badge inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-sm font-medium',
-            getColorBadgeClasses(activeBlock?.color)
-          )}>
-            {activeBlock?.emoji && <span>{activeBlock.emoji}</span>}
+          <h1 className="screen-title">
             {activeBlock?.label || 'No block'}
-          </div>
+          </h1>
           {activeBlock?.description && (
             <div className="focus-split-description line-clamp-2 max-w-[90vw] px-4 font-mono text-sm text-(--muted-text) md:max-w-md">
               {activeBlock.description}
@@ -434,15 +418,9 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               <p className="font-mono text-sm text-(--muted-text)">
                 Tap, Space, or Enter
               </p>
-              <div
-                className={clsx(
-                  'w-full rounded-2xl border px-4 py-5 flex flex-col items-center gap-2 text-center',
-                  getColorBorderClass(nextBlock.color),
-                  getColorBadgeClasses(nextBlock.color)
-                )}
-              >
-                {nextBlock.emoji && <span className="text-3xl">{nextBlock.emoji}</span>}
-                <div className="font-mono font-bold">{nextBlock.label}</div>
+              <div className="flex w-full flex-col items-center gap-2 bg-(--block-color) px-4 py-5 text-center">
+                <div className="h-1 w-16" style={{ background: swatch(nextBlock.color) }} />
+                <div className="font-semibold">{nextBlock.label}</div>
                 <div className="font-mono text-xs text-(--muted-text)">{formatTime(nextBlock.duration)}</div>
               </div>
             </div>
@@ -470,7 +448,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               }}
               type="button"
               aria-label={awaitingNext ? 'Start next slot' : isPaused ? 'Play' : 'Pause'}
-              className="focus-control-btn is-emphasis h-12 w-12 shadow-md hover:scale-[1.02] sm:h-14 sm:w-14"
+              className="focus-control-btn is-emphasis h-12 w-12 sm:h-14 sm:w-14"
             >
               {awaitingNext || isPaused ? <Play size={24} fill="currentColor" className="ml-1" /> : <Pause size={24} fill="currentColor" />}
             </button>

@@ -16,7 +16,7 @@ export const DSL_SYNTAX_LINES = [
 export const DSL_REFERENCE_EXAMPLES: DslReferenceExample[] = [
   {
     title: 'Single block',
-    dsl: '25m work {Deep work} [emoji:💻, color:orange]',
+    dsl: '25m work {Deep work} [emoji:\u{1F4BB}, color:orange]',
   },
   {
     title: 'Loop',
@@ -24,7 +24,7 @@ export const DSL_REFERENCE_EXAMPLES: DslReferenceExample[] = [
   },
   {
     title: 'Custom rest',
-    dsl: '10m break [emoji:☕, color:teal]',
+    dsl: '10m break [emoji:\u{2615}, color:teal]',
   },
   {
     title: 'HIIT',
@@ -32,7 +32,7 @@ export const DSL_REFERENCE_EXAMPLES: DslReferenceExample[] = [
   },
   {
     title: 'Aeropress',
-    dsl: '3 * (1m prep [emoji:☕] + 4m brew + 2m rest [color:teal])',
+    dsl: '3 * (1m prep [emoji:\u{2615}] + 4m brew + 2m rest [color:teal])',
   },
   {
     title: 'Pomodoro',
@@ -45,4 +45,4 @@ export const DSL_REFERENCE_EXAMPLES: DslReferenceExample[] = [
 ];
 
 export const DSL_EDITOR_PLACEHOLDER =
-  'Write DSL directly, e.g. 3 * (25m work [emoji:💻] + 5m rest [emoji:☕])';
+  'Write DSL directly, e.g. 3 * (25m work [emoji:\u{1F4BB}] + 5m rest [emoji:\u{2615}])';

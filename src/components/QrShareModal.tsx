@@ -1,4 +1,4 @@
-import { QrCode, X, Copy } from 'lucide-react';
+import { X, Copy } from 'lucide-react';
 
 type QrShareModalProps = {
   shareUrl: string;
@@ -8,12 +8,9 @@ type QrShareModalProps = {
 export function QrShareModal({ shareUrl, onClose }: QrShareModalProps) {
   return (
     <div className="modal-backdrop">
-      <div className="modal glass max-w-sm text-center space-y-6">
-        <div className="flex justify-between items-center pb-2 border-b border-(--border-color)">
-          <h3 className="text-md font-mono font-semibold flex items-center gap-2">
-            <QrCode size={18} />
-            Share Session
-          </h3>
+      <div className="modal max-w-sm space-y-4 text-left">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold">Share</h3>
           <button
             onClick={onClose}
             className="opacity-50 hover:opacity-100 p-1 rounded-md hover:bg-white/5"
@@ -29,7 +26,7 @@ export function QrShareModal({ shareUrl, onClose }: QrShareModalProps) {
             className="w-48 h-48"
           />
         </div>
-        <p className="text-xs opacity-75 font-mono">
+        <p className="text-sm text-(--muted-text)">
           Scan with your phone or copy the link below to import this session.
         </p>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -37,7 +34,7 @@ export function QrShareModal({ shareUrl, onClose }: QrShareModalProps) {
             type="text"
             readOnly
             value={shareUrl}
-            className="w-full min-w-0 text-xs p-2.5 border border-(--border-color) bg-(--block-color) rounded-lg select-all outline-none font-mono"
+            className="input min-w-0 font-mono text-xs"
           />
           <button
             onClick={() => {

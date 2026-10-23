@@ -9,7 +9,6 @@ import { PasskeyUnlockBanner } from './components/PasskeyUnlockBanner';
 import { OAuthStatusModals } from './components/OAuthStatusModals';
 import { QrShareModal } from './components/QrShareModal';
 import { KeyboardHelpModal } from './components/KeyboardHelpModal';
-import { MobileSessionBar } from './components/MobileSessionBar';
 import { stringifyBlocks } from './utils/dslSchema';
 import { buildShareUrl } from './utils/shareFlow';
 import { BREAKPOINTS } from './constants/breakpoints';
@@ -82,18 +81,14 @@ function App() {
     >
       <AppNav
         variant="app"
-        connectionStatus={auth.connectionStatus}
+        current="session"
         isDark={ui.isDark}
         onNavigatePrompts={() => navigate('/prompts')}
         onOpenSettings={ui.openSettings}
         onToggleDarkMode={ui.toggleDarkMode}
       />
 
-      <main
-        className={`app-main mx-auto w-full max-w-full grow overflow-x-hidden px-4 sm:px-6 lg:px-8 ${
-          isDesktop ? 'pb-10' : 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]'
-        }`}
-      >
+      <main className="app-main app-canvas overflow-x-hidden px-4 pt-6 pb-10 sm:px-6 lg:px-8">
         {isFocusMode ? (
           <FocusView blocks={blocks} toggleFocusMode={toggleFocusMode} setBlocks={setBlocks} />
         ) : (
@@ -115,7 +110,34 @@ function App() {
             onRefreshAdvice={auth.generateAdvice}
             onOpenSettings={ui.openSettings}
             onModelChange={auth.persistModelId}
+            connectionLabel={
+              auth.connectionStatus === 'connected-passkey'
+                ? 'OpenRouter vault'
+                : auth.connectionStatus === 'connected-session'
+                  ? 'OpenRouter session'
+                  : auth.connectionStatus === 'locked-passkey'
+                    ? 'Vault locked'
+                    : 'Offline'
+            }
           />
+        )}
+
+        {!isFocusMode && (
+          <footer className="mt-16 py-6">
+            <div className="flex flex-wrap items-center gap-4 text-xs text-(--muted-text)">
+              <a
+                href="/llms.txt"
+                className="hover:text-(--text-color)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                For AI agents
+              </a>
+              <button onClick={() => navigate('/ai')} className="hover:text-(--text-color)" type="button">
+                AI integration
+              </button>
+            </div>
+          </footer>
         )}
       </main>
 
@@ -172,29 +194,6 @@ function App() {
       {ui.showQrModal && <QrShareModal shareUrl={ui.shareUrl} onClose={ui.closeQrModal} />}
 
       {ui.showKeyboardHelp && <KeyboardHelpModal onClose={ui.closeKeyboardHelp} />}
-
-      {!isFocusMode && !isDesktop && (
-        <MobileSessionBar resume={resume} onReset={resetSession} onToggleFocus={toggleFocusMode} />
-      )}
-
-      {!isFocusMode && (
-        <footer className="mx-auto mt-8 w-full max-w-6xl border-t border-(--border-color)/30 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs opacity-50 transition-opacity hover:opacity-70">
-              <a
-                href="/llms.txt"
-                className="font-mono hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                For AI agents / LLMs
-              </a>
-              <span className="opacity-30">•</span>
-              <button onClick={() => navigate('/ai')} className="font-mono hover:underline" type="button">
-                AI Integration Docs
-              </button>
-          </div>
-        </footer>
-      )}
     </div>
   );
 }
