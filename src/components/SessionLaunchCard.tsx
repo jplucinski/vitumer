@@ -44,15 +44,12 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
   return (
     <section
       aria-label="Session launch"
-      className="surface-card rounded-3xl border border-blue-500/25 bg-linear-to-br from-blue-500/8 via-transparent to-transparent p-5 sm:p-6 sticky top-4 z-20"
+      className="surface-card sticky top-4 z-20 rounded-2xl border border-(--border-color) p-5 sm:p-6"
     >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-3 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]" />
-            <div className="text-sm font-medium text-blue-300/90">
-              {showResume ? 'Pick up where you left off' : 'Ready when you are'}
-            </div>
+          <div className="text-sm font-medium">
+            {showResume ? 'Pick up where you left off' : 'Ready when you are'}
           </div>
 
           {canStart ? (
@@ -66,11 +63,11 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
               </p>
 
               {allCompleted ? (
-                <p className="text-sm opacity-60 font-mono">All blocks completed — reset to run again.</p>
+                <p className="text-sm font-mono text-(--muted-text)">All blocks completed. Reset to run again.</p>
               ) : (
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono uppercase tracking-wider opacity-40">Next</span>
+                    <span className="text-xs font-mono text-(--muted-text)">Next</span>
                     <span
                       className={clsx(
                         'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wide uppercase',
@@ -105,7 +102,7 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
                     aria-label="Session progress"
                   >
                     <div
-                      className="h-full rounded-full bg-blue-500 transition-all duration-500 ease-out"
+                      className="meter-fill h-full rounded-full"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
@@ -113,7 +110,7 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
               )}
             </>
           ) : (
-            <p className="text-sm opacity-60 font-mono leading-relaxed">
+            <p className="text-sm font-mono leading-relaxed text-(--muted-text)">
               Add blocks with AI or the DSL editor to start a session.
             </p>
           )}
@@ -124,7 +121,7 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
             <button
               onClick={onReset}
               disabled={!canStart}
-              className="px-4 py-2.5 rounded-2xl border border-(--border-color) text-sm font-medium hover:bg-white/5 transition-colors opacity-70 hover:opacity-100 disabled:opacity-30 disabled:pointer-events-none"
+              className="rounded-xl border border-(--border-color) px-4 py-2.5 text-sm font-medium text-(--text-color) transition-colors hover:bg-(--block-color) disabled:pointer-events-none disabled:opacity-30"
               type="button"
             >
               <span className="inline-flex items-center gap-2">
@@ -135,7 +132,7 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
             <button
               onClick={onStart}
               disabled={!canStart}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black dark:bg-white dark:text-black rounded-2xl text-sm font-semibold hover:scale-[1.02] transition-transform shadow-xl disabled:opacity-30 disabled:pointer-events-none disabled:hover:scale-100"
+              className="btn btn-primary-solid gap-2 px-6 py-3 text-sm font-semibold disabled:pointer-events-none"
               type="button"
             >
               <Play size={16} fill="currentColor" />
@@ -143,7 +140,7 @@ const SessionLaunchCard = ({ blocks, onStart, onReset, resume }: Props) => {
             </button>
           </div>
           {canStart && (
-            <span className="text-[11px] font-mono opacity-40 text-right">
+            <span className="text-right font-mono text-[11px] text-(--muted-text)">
               {showResume ? 'Press F to resume' : 'Press F to start'}
             </span>
           )}

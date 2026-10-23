@@ -12,7 +12,7 @@ export function MobileSessionBar({ resume, onReset, onToggleFocus }: MobileSessi
     <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-center gap-3 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-(--border-color) bg-[var(--bg-color)]/95 backdrop-blur-md">
       <button
         onClick={onReset}
-        className="w-12 h-12 flex items-center justify-center rounded-full border border-(--border-color) hover:bg-(--block-color) transition-colors opacity-70 hover:opacity-100"
+        className="flex h-12 w-12 items-center justify-center rounded-full border border-(--border-color) text-(--text-color) transition-colors hover:bg-(--block-color)"
         title="Reset Session"
         aria-label="Reset Session"
         type="button"
@@ -21,7 +21,7 @@ export function MobileSessionBar({ resume, onReset, onToggleFocus }: MobileSessi
       </button>
       <button
         onClick={onToggleFocus}
-        className="flex items-center gap-2 px-6 py-3 bg-white text-black dark:bg-white dark:text-black rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-lg"
+        className="btn btn-primary-solid gap-2 rounded-full px-6 py-3 text-sm font-medium"
         type="button"
         aria-label={resume ? 'Resume Session' : 'Start Session'}
       >

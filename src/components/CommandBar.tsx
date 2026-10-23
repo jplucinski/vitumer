@@ -1,9 +1,12 @@
 // src/components/CommandBar.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import clsx from 'clsx';
 import { CornerDownLeft } from 'lucide-react';
 import { parseDSL, FlowBlock } from '../utils/dslParser';
+import { stringifyBlocks } from '../utils/dslSchema';
+import { analyzeDSL, getLineColumn } from '../utils/dslLint';
 import AISessionThread from './AISessionThread';
+import { DslEditor } from './DslEditor';
 import {
   DSL_EDITOR_PLACEHOLDER,
   DSL_REFERENCE_EXAMPLES,
@@ -12,6 +15,7 @@ import {
 import type { PromptMode } from '../constants/aiPrompts';
 
 interface CommandBarProps {
+  blocks: FlowBlock[];
   setBlocks: React.Dispatch<React.SetStateAction<FlowBlock[]>>;
   apiKey: string | null;
   modelId: string;
@@ -24,6 +28,7 @@ interface CommandBarProps {
 }
 
 const CommandBar: React.FC<CommandBarProps> = ({
+  blocks,
   setBlocks,
   apiKey,
   modelId,
@@ -35,11 +40,14 @@ const CommandBar: React.FC<CommandBarProps> = ({
   dslFocusToken = 0,
 }) => {
   const [activeTab, setActiveTab] = useState<'ai' | 'dsl'>('ai');
-  const [dslInput, setDslInput] = useState('');
+  const canonicalDsl = useMemo(() => stringifyBlocks(blocks), [blocks]);
+  const [dslInput, setDslInput] = useState(canonicalDsl);
+  const dslFocused = useRef(false);
   const [dslError, setDslError] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackType, setFeedbackType] = useState<'success' | 'error' | 'info'>('info');
   const feedbackTimer = useRef<number | null>(null);
+  const dslAnalysis = useMemo(() => analyzeDSL(dslInput), [dslInput]);
 
   const showTransientFeedback = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setFeedbackMessage(message);
@@ -58,6 +66,11 @@ const CommandBar: React.FC<CommandBarProps> = ({
     if (dslFocusToken > 0) setActiveTab('dsl');
   }, [dslFocusToken]);
 
+  useEffect(() => {
+    if (dslFocused.current) return;
+    setDslInput(canonicalDsl);
+  }, [canonicalDsl]);
+
   const handleEditInDsl = (dsl: string) => {
     setActiveTab('dsl');
     setDslInput(dsl);
@@ -65,12 +78,12 @@ const CommandBar: React.FC<CommandBarProps> = ({
 
   const handleDSLSubmit = () => {
     const trimmed = dslInput.trim();
-    if (!trimmed) return;
+    if (!trimmed || dslAnalysis.diagnostics.length > 0) return;
     try {
       const parsed = parseDSL(trimmed);
       if (parsed.length > 0) {
+        setDslInput(stringifyBlocks(parsed));
         setBlocks(parsed);
-        setDslInput('');
         setDslError('');
         showTransientFeedback('DSL session applied.', 'success');
       } else {
@@ -87,10 +100,10 @@ const CommandBar: React.FC<CommandBarProps> = ({
         <div className="flex items-center gap-1 p-2 border-b border-(--border-color) bg-black/[0.02] dark:bg-white/[0.02]">
           <button
             className={clsx(
-              'px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all',
+              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
               activeTab === 'ai'
-                ? 'bg-white text-black dark:bg-white dark:text-black shadow-sm'
-                : 'opacity-55 hover:opacity-100'
+                ? 'tab-active'
+                : 'text-(--muted-text) hover:text-(--text-color)'
             )}
             onClick={() => setActiveTab('ai')}
             type="button"
@@ -99,10 +112,10 @@ const CommandBar: React.FC<CommandBarProps> = ({
           </button>
           <button
             className={clsx(
-              'px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all',
+              'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors',
               activeTab === 'dsl'
-                ? 'bg-white text-black dark:bg-white dark:text-black shadow-sm'
-                : 'opacity-55 hover:opacity-100'
+                ? 'tab-active'
+                : 'text-(--muted-text) hover:text-(--text-color)'
             )}
             onClick={() => setActiveTab('dsl')}
             type="button"
@@ -126,30 +139,61 @@ const CommandBar: React.FC<CommandBarProps> = ({
         ) : (
           <div className="p-4 space-y-4">
             <div className="relative">
-              <textarea
-                rows={4}
+              <DslEditor
                 value={dslInput}
-                onChange={(e) => setDslInput(e.target.value)}
-                className="w-full resize-none rounded-2xl border border-(--border-color) bg-(--bg-color)/50 p-4 font-mono text-sm outline-none focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/20"
+                analysis={dslAnalysis}
+                onChange={(value) => {
+                  setDslInput(value);
+                  setDslError('');
+                }}
+                onFocus={() => {
+                  dslFocused.current = true;
+                }}
+                onBlur={() => {
+                  dslFocused.current = false;
+                }}
+                onSubmit={handleDSLSubmit}
                 placeholder={DSL_EDITOR_PLACEHOLDER}
               />
               <button
                 onClick={handleDSLSubmit}
-                className="absolute right-3 bottom-3 rounded-full bg-white text-black p-2.5 shadow-md hover:scale-105 transition-transform"
+                disabled={dslAnalysis.diagnostics.length > 0}
+                aria-label="Apply DSL (Ctrl+Enter)"
+                title="Apply (Ctrl+Enter)"
+                className="absolute right-3 bottom-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-(--text-color) text-(--bg-color) transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 type="button"
               >
                 <CornerDownLeft size={15} />
               </button>
             </div>
 
+            {dslAnalysis.diagnostics.length > 0 && (
+              <ul
+                aria-live="polite"
+                className="space-y-1 rounded-xl border border-rose-600/20 bg-rose-500/10 px-3 py-2.5 font-mono text-xs text-rose-800 dark:text-rose-200"
+              >
+                {dslAnalysis.diagnostics.slice(0, 5).map((d) => {
+                  const { line, column } = getLineColumn(dslInput, d.start);
+                  return (
+                    <li key={`${d.start}-${d.message}`}>
+                      <span className="opacity-60">{line}:{column}</span> {d.message}
+                    </li>
+                  );
+                })}
+                {dslAnalysis.diagnostics.length > 5 && (
+                  <li className="opacity-60">+{dslAnalysis.diagnostics.length - 5} more</li>
+                )}
+              </ul>
+            )}
+
             {dslError && (
-              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs text-red-200 font-mono">
+              <div className="rounded-xl border border-rose-600/20 bg-rose-500/10 px-3 py-2.5 font-mono text-xs text-rose-800 dark:text-rose-200">
                 {dslError}
               </div>
             )}
 
             <div className="rounded-2xl border border-(--border-color) bg-(--bg-color)/40 p-4 text-sm font-mono space-y-3">
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.24em] opacity-50">
+              <div className="flex items-center justify-between text-xs text-(--muted-text)">
                 <span>DSL Reference Guide</span>
                 <span>Syntax</span>
               </div>
@@ -175,9 +219,9 @@ const CommandBar: React.FC<CommandBarProps> = ({
         <div
           className={clsx(
             'px-4 py-2.5 text-sm font-medium rounded-xl',
-            feedbackType === 'success' && 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/10',
-            feedbackType === 'error' && 'bg-rose-500/10 text-rose-200 border border-rose-400/10',
-            feedbackType === 'info' && 'bg-slate-800/70 text-slate-100 border border-slate-700/50'
+            feedbackType === 'success' && 'border border-emerald-600/20 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200',
+            feedbackType === 'error' && 'border border-rose-600/20 bg-rose-500/10 text-rose-800 dark:text-rose-200',
+            feedbackType === 'info' && 'border border-(--border-color) bg-(--block-color) text-(--text-color)'
           )}
         >
           {feedbackMessage}

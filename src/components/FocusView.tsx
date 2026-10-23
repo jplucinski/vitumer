@@ -309,58 +309,54 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
   const renderTimeline = (showMobileHeader = false) => (
     <>
-      {showMobileHeader && (
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xs font-mono uppercase tracking-widest opacity-40">Timeline Flow</h3>
-          <button
-            type="button"
-            onClick={() => setIsTimelineOpen(false)}
-            className="p-1 rounded-md opacity-50 hover:opacity-100 hover:bg-white/5"
-            aria-label="Close timeline"
-          >
-            <X size={18} />
-          </button>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h3 className="text-sm font-medium">Timeline</h3>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs text-(--muted-text)">
+            {completedCount}/{blocks.length}
+          </span>
+          {showMobileHeader && (
+            <button
+              type="button"
+              onClick={() => setIsTimelineOpen(false)}
+              className="rounded-md p-1 text-(--text-color) hover:bg-(--block-color)"
+              aria-label="Close timeline"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
-      )}
-      {!showMobileHeader && (
-        <>
-          <h3 className="text-xs font-mono uppercase tracking-widest opacity-40 mb-4">Timeline Flow</h3>
-          <div className="mb-4 flex items-center justify-between gap-3 text-xs opacity-70">
-            <span className="font-semibold">Upcoming blocks: {upcomingBlocks.length}</span>
-            <span>Focus mode</span>
-          </div>
-        </>
-      )}
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl md:shadow-none max-h-[50vh] md:max-h-[60vh] overflow-y-auto space-y-6 relative before:absolute before:inset-y-2 before:left-[11px] before:w-px before:bg-[var(--border-color)]">
+      </div>
+      <div className="relative max-h-[50vh] space-y-5 overflow-y-auto md:max-h-[60vh] before:absolute before:inset-y-2 before:left-[11px] before:w-px before:bg-(--border-color)">
         {completedBlocks.map((block, i) => (
-          <div key={`comp-${i}`} className="flex gap-4 opacity-40 relative z-10">
-            <div className="w-6 h-6 rounded-full bg-[var(--bg-color)] border-2 border-gray-400 flex items-center justify-center mt-0.5">
-              <div className="w-2 h-2 rounded-full bg-gray-400" />
+          <div key={`comp-${i}`} className="relative z-10 flex gap-4 text-(--muted-text)">
+            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-(--border-color) bg-(--bg-color)">
+              <div className="h-2 w-2 rounded-full bg-(--muted-text)" />
             </div>
             <div className="font-mono text-sm">
               <div className="line-through">{block.label}</div>
-              <div className="text-xs opacity-70">{Math.floor(block.duration / 60)}m</div>
+              <div className="text-xs">{formatTime(block.duration)}</div>
             </div>
           </div>
         ))}
 
         {activeBlock && (
-          <div className="flex gap-4 relative z-10">
+          <div className="relative z-10 flex gap-4">
             <div className={clsx(
-              'w-6 h-6 rounded-full bg-[var(--bg-color)] border-2 flex items-center justify-center mt-0.5 shadow-[0_0_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_10px_rgba(255,255,255,0.1)]',
+              'mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-(--bg-color)',
               getColorBorderClass(activeBlock.color)
             )}>
-              <div className={clsx('w-2.5 h-2.5 rounded-full animate-pulse', getColorPulseClass(activeBlock.color))} />
+              <div className={clsx('h-2.5 w-2.5 rounded-full motion-safe:animate-pulse', getColorPulseClass(activeBlock.color))} />
             </div>
-            <div className="font-mono text-sm font-bold">
+            <div className="font-mono text-sm font-semibold">
               <div className="flex items-center gap-1.5">
                 {activeBlock.emoji && <span>{activeBlock.emoji}</span>}
                 {activeBlock.label}
               </div>
-              <div className="text-xs opacity-70 flex gap-2">
-                <span>{Math.floor(activeBlock.duration / 60)}m</span>
+              <div className="flex gap-2 text-xs font-normal text-(--muted-text)">
+                <span>{formatTime(activeBlock.duration)}</span>
                 {activeBlock.description && (
-                  <span className="opacity-50 truncate max-w-[150px]">{activeBlock.description}</span>
+                  <span className="max-w-[150px] truncate">{activeBlock.description}</span>
                 )}
               </div>
             </div>
@@ -368,11 +364,11 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
         )}
 
         {upcomingBlocks.map((block, i) => (
-          <div key={`up-${i}`} className="flex gap-4 opacity-60 relative z-10">
-            <div className="w-6 h-6 rounded-full bg-[var(--bg-color)] border-2 border-(--border-color) flex items-center justify-center mt-0.5" />
+          <div key={`up-${i}`} className="relative z-10 flex gap-4">
+            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-(--border-color) bg-(--bg-color)" />
             <div className="font-mono text-sm">
               <div>{block.label}</div>
-              <div className="text-xs opacity-70">{Math.floor(block.duration / 60)}m</div>
+              <div className="text-xs text-(--muted-text)">{formatTime(block.duration)}</div>
             </div>
           </div>
         ))}
@@ -381,7 +377,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
   );
 
   return (
-    <div className="focus-split mt-4 sm:mt-8 px-0 animate-in fade-in zoom-in-95 duration-300">
+    <div className="focus-split mt-4 px-0 sm:mt-8">
       <div className="focus-split-main">
         <div
           ref={stageRef}
@@ -395,39 +391,25 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             className="pointer-events-none absolute inset-0 -z-10"
             style={{
               background:
-                'radial-gradient(circle at 50% 40%, var(--accent-glow), transparent 42%), radial-gradient(circle at 80% 80%, var(--accent-glow-secondary), transparent 46%)',
+                'radial-gradient(circle at 50% 40%, var(--accent-glow), transparent 55%)',
             }}
           />
-          <div className="focus-split-mobile-chips flex-wrap items-center justify-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-60 max-w-full px-2">
-            <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-              {completedCount}/{blocks.length} done
-            </span>
-            <span className="hidden min-[360px]:inline px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-              Tap ▶ to start
-            </span>
-          </div>
-          <div className="focus-split-desktop-chips flex-wrap items-center justify-center gap-3 text-[11px] uppercase tracking-[0.24em] opacity-60">
-            <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-              {completedCount}/{blocks.length} completed
-            </span>
-          </div>
           {!(awaitingNext && nextBlock) && (
             <>
           <div className={clsx(
-            'focus-split-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono tracking-widest uppercase mb-4',
+            'focus-split-badge inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-sm font-medium',
             getColorBadgeClasses(activeBlock?.color)
           )}>
             {activeBlock?.emoji && <span>{activeBlock.emoji}</span>}
             {activeBlock?.label || 'No block'}
           </div>
           {activeBlock?.description && (
-            <div className="focus-split-description text-sm opacity-60 font-mono -mt-4 mb-2 max-w-[90vw] md:max-w-md line-clamp-2 px-4">
+            <div className="focus-split-description line-clamp-2 max-w-[90vw] px-4 font-mono text-sm text-(--muted-text) md:max-w-md">
               {activeBlock.description}
             </div>
           )}
 
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-white/5 blur-2xl opacity-40" aria-hidden />
             <div
               className={clsx(
                 'focus-timer relative',
@@ -440,7 +422,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
           <div className="focus-split-immersive-progress w-full max-w-md h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-linear shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+              className="meter-fill h-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -449,8 +431,8 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
           {awaitingNext && nextBlock && (
             <div className="flex flex-col items-center gap-3 px-4 max-w-md w-full">
-              <p className="text-[10px] uppercase tracking-[0.2em] opacity-50 font-mono">
-                Tap · Space · Enter
+              <p className="font-mono text-sm text-(--muted-text)">
+                Tap, Space, or Enter
               </p>
               <div
                 className={clsx(
@@ -461,7 +443,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               >
                 {nextBlock.emoji && <span className="text-3xl">{nextBlock.emoji}</span>}
                 <div className="font-mono font-bold">{nextBlock.label}</div>
-                <div className="text-xs opacity-70 font-mono">{formatTime(nextBlock.duration)}</div>
+                <div className="font-mono text-xs text-(--muted-text)">{formatTime(nextBlock.duration)}</div>
               </div>
             </div>
           )}
@@ -488,7 +470,7 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
               }}
               type="button"
               aria-label={awaitingNext ? 'Start next slot' : isPaused ? 'Play' : 'Pause'}
-              className="focus-control-btn w-12 h-12 sm:w-14 sm:h-14 bg-black text-white dark:bg-white dark:text-black hover:scale-[1.02] shadow-xl border-transparent opacity-100"
+              className="focus-control-btn is-emphasis h-12 w-12 shadow-md hover:scale-[1.02] sm:h-14 sm:w-14"
             >
               {awaitingNext || isPaused ? <Play size={24} fill="currentColor" className="ml-1" /> : <Pause size={24} fill="currentColor" />}
             </button>
@@ -535,30 +517,20 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
             onClick={() => setIsTimelineOpen(!isTimelineOpen)}
             type="button"
             aria-expanded={isTimelineOpen}
-            className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-(--bg-color)"
           >
-            <span className="text-[11px] font-mono uppercase tracking-[0.2em] opacity-50">Timeline</span>
-            <span className="flex items-center gap-2 text-xs font-mono opacity-70">
+            <span className="text-sm">Timeline</span>
+            <span className="flex items-center gap-2 font-mono text-xs text-(--muted-text)">
               {completedCount}/{blocks.length}
-              {upcomingBlocks.length > 0 && (
-                <span className="opacity-50">· {upcomingBlocks.length} left</span>
-              )}
               {isTimelineOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
             </span>
           </button>
           <div className="h-1 bg-black/5 dark:bg-white/5">
             <div
-              className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-linear"
+              className="meter-fill h-full"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-        </div>
-
-        <div className="focus-split-desktop-progress absolute bottom-0 left-0 w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-300 ease-linear shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-            style={{ width: `${progressPercent}%` }}
-          />
         </div>
       </div>
 
@@ -577,12 +549,13 @@ const FocusView: React.FC<FocusViewProps> = ({ blocks, toggleFocusMode, setBlock
 
       <div
         className={clsx(
-          'focus-split-sheet fixed inset-x-0 bottom-0 z-50 bg-[var(--bg-color)] border-t border-(--border-color) rounded-t-3xl shadow-2xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-in-out max-h-[70vh] overflow-y-auto',
-          isTimelineOpen ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+          'focus-split-sheet fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t border-(--border-color) bg-(--bg-color) p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl transition-transform duration-300 ease-in-out',
+          isTimelineOpen ? 'translate-y-0' : 'pointer-events-none translate-y-full'
         )}
+        aria-hidden={!isTimelineOpen}
       >
-        <div className="w-12 h-1 bg-[var(--border-color)] rounded-full mx-auto mb-4" />
-        {renderTimeline(true)}
+        <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-(--border-color)" />
+        {isTimelineOpen && renderTimeline(true)}
       </div>
     </div>
   );

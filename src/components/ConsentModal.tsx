@@ -24,10 +24,10 @@ export function ConsentModal({
         </p>
         <ul className="text-xs opacity-70 space-y-2 mb-6 list-disc pl-4">
           <li>
-            <strong>Session only</strong> — plaintext in this tab until you close it.
+            <strong>Session only:</strong> plaintext in this tab until you close it.
           </li>
           <li>
-            <strong>Lock with passkey</strong> — AES-GCM ciphertext in localStorage, unlocked via
+            <strong>Lock with passkey:</strong> AES-GCM ciphertext in localStorage, unlocked via
             WebAuthn PRF (Face ID / Windows Hello / security key).
           </li>
         </ul>
@@ -56,7 +56,7 @@ export function ConsentModal({
         </div>
         {!prfAvailable && (
           <p className="text-[10px] opacity-50 mt-3">
-            Passkey PRF unavailable here — use session only, or try Chrome/Edge/Safari on a device with
+            Passkey PRF unavailable here. Use session only, or try Chrome, Edge, or Safari on a device with
             a platform authenticator.
           </p>
         )}

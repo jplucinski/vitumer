@@ -20,21 +20,9 @@ const PromptsPage = ({ onNavigate }: Props) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const marqueeTitles = [...AI_PROMPT_DOCS.map((doc) => doc.title), ...AI_PROMPT_DOCS.map((doc) => doc.title)];
-
   return (
     <div className="min-h-screen app-container overflow-x-hidden transition-colors duration-300">
       <AppNav variant="subpage" onBack={() => onNavigate('/')} />
-
-      <div className="marquee-mask border-y border-(--border-color)/40 py-4">
-        <div className="marquee-track text-sm font-medium opacity-60">
-          {marqueeTitles.map((title, index) => (
-            <span key={`${title}-${index}`} className="whitespace-nowrap">
-              {title}
-            </span>
-          ))}
-        </div>
-      </div>
 
       <main ref={revealRef} className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 pb-24 sm:px-6">
         <header className="py-8" data-reveal>
@@ -150,8 +138,8 @@ const PromptsPage = ({ onNavigate }: Props) => {
         </div>
 
         <p className="mt-10 px-4 text-center text-sm leading-relaxed opacity-50">
-          Vitumer runs entirely in your browser. API keys are stored locally and requests go directly to OpenRouter —
-          no intermediary server.
+          Vitumer runs entirely in your browser. API keys are stored locally and requests go directly to OpenRouter.
+          No intermediary server.
         </p>
       </main>
     </div>

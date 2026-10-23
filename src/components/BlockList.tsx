@@ -170,7 +170,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
           className={clsx(
             'block-card group w-full text-left flex items-stretch gap-0 rounded-2xl border border-(--border-color) bg-(--block-color)/60 overflow-hidden cursor-pointer',
             'hover:bg-(--block-color) active:scale-[0.995]',
-            block.active && 'border-blue-500/40 ring-1 ring-blue-500/20',
+            block.active && 'border-(--color-primary)/40 ring-1 ring-(--color-primary)/25',
             block.completed && 'is-completed'
           )}
           style={{ '--block-accent': COLOR_SWATCH[block.color] || COLOR_SWATCH.orange }}
@@ -240,7 +240,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                   e.stopPropagation();
                   setBlocks((prev) => prev.filter((item) => item.id !== block.id));
                 }}
-                className="inline-flex items-center justify-center p-2 rounded-xl opacity-55 hover:opacity-100 hover:bg-red-500/15 hover:text-red-300 transition-all"
+                className="inline-flex items-center justify-center rounded-xl p-2 text-(--text-color) transition-colors hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300"
                 aria-label="Delete block"
               >
                 <Trash2 size={15} />
@@ -472,7 +472,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
             <div className="p-4 sm:p-5 flex flex-col gap-2.5 shrink-0 border-t border-(--border-color) bg-(--bg-color)">
               <button
                 onClick={saveBlock}
-                className="w-full px-4 py-3.5 rounded-2xl bg-white text-black font-semibold hover:scale-[1.01] transition-transform text-sm"
+                className="btn btn-primary-solid w-full py-3.5 text-sm font-semibold"
                 type="button"
               >
                 Save changes
@@ -487,7 +487,7 @@ const BlockList = ({ blocks, setBlocks }: BlockListProps) => {
                 </button>
                 <button
                   onClick={deleteBlock}
-                  className="flex-1 px-4 py-2.5 rounded-2xl border border-red-500/25 text-red-300 hover:bg-red-500/10 transition-all text-sm"
+                  className="flex-1 rounded-xl border border-red-600/25 px-4 py-2.5 text-sm text-red-700 transition-colors hover:bg-red-500/10 dark:text-red-300"
                   type="button"
                 >
                   Delete
